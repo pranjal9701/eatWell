@@ -1,0 +1,450 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <title>EatWell</title>
+
+    <!-- Google fonts -->
+    <link href='http://fonts.googleapis.com/css?family=Roboto:400,300,700' rel='stylesheet' type='text/css'>
+    <link href='http://fonts.googleapis.com/css?family=Lobster' rel='stylesheet' type='text/css'>
+    <link href='http://fonts.googleapis.com/css?family=Josefin+Sans:600' rel='stylesheet' type='text/css'>
+
+    <!-- font awesome -->
+    <!-- <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css" rel="stylesheet"> -->
+
+    <!-- bootstrap -->
+    <link rel="stylesheet" href="assets/bootstrap/css/bootstrap.min.css" />
+
+    <!-- animate.css -->
+    <link rel="stylesheet" href="assets/animate/animate.css" />
+    <link rel="stylesheet" href="assets/animate/set.css" />
+
+    <!-- gallery -->
+    <link rel="stylesheet" href="assets/gallery/blueimp-gallery.min.css">
+
+    <!-- favicon -->
+    <link rel="shortcut icon" href="images/favicon.ico" type="image/x-icon">
+    <link rel="icon" href="images/favicon.ico" type="image/x-icon">
+
+
+    <link rel="stylesheet" href="assets/style.css">
+    
+    <!-- back4app -->
+    <script src="https://unpkg.com/parse/dist/parse.min.js"></script>
+    <script>
+        //PASTE HERE YOUR Back4App APPLICATION ID AND YOUR JavaScript KEY
+        Parse.initialize("ST1zL1OXQ8iM2Od3jQWaHXNmksg5RQQAgMadoXjd", "bUt5oftXiKJonpKKWbvhf3hc4TtOhxikpVxIpEJg");
+        Parse.serverURL = "https://parseapi.back4app.com/";
+        
+        // This list will hold all the items which are added into the cart.
+        var cartItems = [];
+        
+        // This is used to hold the Category and its corresponding items into a single object list.
+        var catItemList = [];
+        
+        // This map will be used to refer categories according to their id
+        var catMap = new Map();
+        var catCount = 0;
+        var setItemInvokeCount = 0;
+
+        
+        // this method will be called when all the items corresponding to a category are fatched from back4app asynchronously
+        // in this method we will create a list of object. Each object will hold category and its corresponding items list.
+        // after the object list is created, createDynamicComponents() method will be called and it will create all the HTML components.
+        function setItemList(itemList)
+        {
+            setItemInvokeCount++;
+            var inst = new Object();
+            inst.category = catMap.get(itemList[0].get("Category").id.toString());
+            inst.items = itemList;
+            catItemList.push(inst);
+            if(setItemInvokeCount==catCount)
+            {
+                createDynamicComponents(catItemList);
+            }
+        }
+
+        // this method will be called when all the categories are fatched from back4 app asynchronously
+        function setCategoryList(categoryList)
+        {
+            catCount = categoryList.length;
+            for (var i = 0; i < categoryList.length; i++) {
+                var object = categoryList[i];
+                
+                catMap.set(object.id, object);
+            }
+            for (var i = 0; i < categoryList.length; i++) {
+                var object = categoryList[i];
+                
+                var item = Parse.Object.extend("Item");
+                var innerQuery = new Parse.Query(item);
+                innerQuery.equalTo("Category", object);
+                innerQuery.find({
+                    success: function(results) {
+                        // this method will be called when all the items corresponding to a category are fatched from back4app asynchronously
+                        setItemList(results);
+                    },
+                    error: function(error) {
+                        alert("Error: " + error.code + " " + error.message);
+                    }
+                });
+            }
+        }
+
+        // This will be the first Query to run
+        var category = Parse.Object.extend("Category");
+        var query = new Parse.Query(category);
+        query.find({
+            success: function(results) {
+                categoryList =  JSON.stringify(results);
+                // this method will be called when all the categories are fatched from back4 app asynchronously
+                setCategoryList(results);
+            },
+            error: function(error) {
+                alert("Error: " + error.code + " " + error.message);
+            }
+        });
+        
+        
+        
+        
+        
+    </script>
+    <!-- back4app -->
+</head>
+    
+<body>
+    <div class="topbar animated fadeInLeftBig"></div>
+
+    <!-- Header Starts -->
+    <div class="navbar-wrapper">
+        <div class="container">
+
+            <div class="navbar navbar-inverse navbar-fixed-top" role="navigation" id="top-nav">
+                <div class="container">
+                    <div class="navbar-header">
+                        <!-- Logo Starts -->
+                        <a class="navbar-brand" href="home.html">
+                            <img src="images/logo.png" alt="logo"></a>
+                        <!-- #Logo Ends -->
+
+
+                        <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target=".navbar-collapse">
+                            <span class="sr-only">Toggle navigation</span>
+                            <span class="icon-bar"></span>
+                            <span class="icon-bar"></span>
+                            <span class="icon-bar"></span>
+                        </button>
+
+                    </div>
+
+
+                    <!-- Nav Starts -->
+                    <div class="navbar-collapse  collapse">
+                        <ul class="nav navbar-nav navbar-right scroll">
+                            <li class="active"><a href="home.html">Home</a></li>
+                            <li class="active"><a href="#">Cart <span class="badge badge-light" id="cartBadge"></span></a></li>
+
+                        </ul>
+                    </div>
+                    <!-- #Nav Ends -->
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+    <!-- #Header Starts -->
+
+    <!-- works -->
+    <div id="foods" class=" clearfix grid">
+    </div>
+    <!-- works -->
+
+    
+
+
+
+    <div>
+
+        <br />
+        <br />
+
+        <br />
+    </div>
+
+
+
+    <div id="tablePanel">
+    </div>
+
+
+    <div class="row">
+        <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3"></div>
+        <div id="addressInfo" class="spacer col-lg-6 col-md-6 col-sm-6 col-xs-6">
+            <form>
+                <div class="form-group">
+                    <label for="exampleInputEmail1">Name</label>
+                    <input type="text" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" placeholder="Enter your Name" />
+                </div>
+                <div class="form-group">
+                    <label for="exampleInputEmail1">Email address</label>
+                    <input type="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" placeholder="Enter email" />
+                </div>
+                <div class="form-group">
+                    <label for="exampleInputEmail1">Address</label>
+                    <input type="text-area" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" />
+                </div>
+                <div class="form-group">
+                    <label for="exampleInputEmail1">Mobile Number</label>
+                    <input type="text" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" placeholder="Enter Mobile Number" />
+                </div>
+                <button type="submit" class="btn btn-primary">Submit</button>
+            </form>
+        </div>
+        <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3"></div>
+    </div>
+
+
+
+
+
+
+    <div id="contact" class="spacer">
+        <!--Contact Starts-->
+
+        <div class="container contactform center">
+            <h2 class="text-center  wowload fadeInUp">Reach Us At</h2>
+            <div class="row wowload fadeInLeftBig">
+                <div class="col-sm-6 col-sm-offset-3 col-xs-12">
+                    <p style="text-align: center;">103/55 City Tower, Central Park Lane, C-Scheme, Jaipur, Rajasthan</p>
+
+                </div>
+            </div>
+            <br />
+            <br />
+            <br />
+            <h2 class="text-center  wowload fadeInUp">Give Us Your Feedback</h2>
+            <div class="row wowload fadeInLeftBig">
+                <div class="col-sm-6 col-sm-offset-3 col-xs-12">
+                    <p style="text-align: center;">Please take a moment to tell us what you think about our website and our products, mail us at eatwell@gmail.com</p>
+                </div>
+            </div>
+        </div>
+
+    </div>
+    <!--Contact Ends-->
+
+
+
+    <!-- Footer Starts -->
+    <div class="footer text-center spacer">
+        <p class="wowload flipInX"><a href="#"><i class="fa fa-facebook fa-2x"></i></a><a href="#"><i class="fa fa-instagram fa-2x"></i></a><a href="#"><i class="fa fa-twitter fa-2x"></i></a><a href="#"><i class="fa fa-flickr fa-2x"></i></a></p>
+        Copyright 2018 EatWell Cafe & Restaurant. All rights reserved.
+    </div>
+    <!-- # Footer Ends -->
+    <a href="#home" class="gototop "><i class="fa fa-angle-up  fa-3x"></i></a>
+
+
+
+
+
+    <!-- The Bootstrap Image Gallery lightbox, should be a child element of the document body -->
+    <div id="blueimp-gallery" class="blueimp-gallery blueimp-gallery-controls">
+        <!-- The container for the modal slides -->
+        <div class="slides"></div>
+        <!-- Controls for the borderless lightbox -->
+        <h3 class="title">Title</h3>
+        <a class="prev">‹</a>
+        <a class="next">›</a>
+        <a class="close">×</a>
+        <!-- The modal dialog, which will be used to wrap the lightbox content -->
+    </div>
+
+
+
+    <!-- jquery -->
+    <script src="assets/jquery.js"></script>
+
+    <!-- wow script -->
+    <script src="assets/wow/wow.min.js"></script>
+
+
+    <!-- boostrap -->
+    <script src="assets/bootstrap/js/bootstrap.js" type="text/javascript"></script>
+
+    <!-- jquery mobile -->
+    <script src="assets/mobile/touchSwipe.min.js"></script>
+    <script src="assets/respond/respond.js"></script>
+
+    <!-- gallery -->
+    <script src="assets/gallery/jquery.blueimp-gallery.min.js"></script>
+
+
+
+    <script>
+        function createDynamicComponents(catItemList)
+        {
+            var container = document.getElementById("foods");
+            container.innerHTML = "";
+            for (var i = 0; i < catItemList.length; i++) {
+                var figure = getFigure(catItemList[i].category);
+                container.appendChild(figure);
+                var modal = getModal(catItemList[i]);
+                container.appendChild(modal);
+            }
+        }
+        
+        function getFigure(category) {
+            var fig = document.createElement("FIGURE");
+            fig.id = "figCategory" + category.get('DataId');
+            fig.className = "effect-oscar  wowload fadeInUp";
+
+            var img = document.createElement("img");
+            img.src = category.get('URL');
+            fig.appendChild(img);
+
+            var figCap = document.createElement("figcaption");
+            figCap.innerHTML =
+                ' <h2> ' + category.get('Name') + ' </h2> '
+               + ' <p> ' + category.get('Description') + ' <br> '
+               + '     <a href="images/portfolio/7.jpg" title="1" data-gallery>View more</a> '
+               + '     <br /> '
+               + '     <br /> '
+               + '     <!-- Trigger the modal with a button --> '
+               + '     <button type="button" class="btn btn-info btn-sm" data-toggle="modal" data-target="#'+category.get('Name')+'Modal'+'">Order Now</button> '
+               + ' </p>';
+            fig.appendChild(figCap);
+
+            return fig;
+        }
+        
+        function getModal(elem)
+        {
+            var pDiv = document.createElement("div");
+            pDiv.id = elem.category.get('Name')+'Modal';
+            pDiv.className = "modal fade";
+            pDiv.role = "dialog";
+            
+            var optionString = '';
+            for(var i=0; i<elem.items.length; i++ ){
+                optionString = optionString + '<option value="'+ elem.items[i].id +'">'+ elem.items[i].get('Name') +' - ₹ ' +elem.items[i].get('Price')+'</option>';
+            }
+            
+            pDiv.innerHTML = '<div class="modal-dialog">'
+                                +'<div class="modal-content">'
+                                    +'<div class="modal-header">'
+                                        +'<button type="button" class="close" data-dismiss="modal">&times;</button>'
+                                        +'<h4 class="modal-title">'+elem.category.get('Name')+'</h4>'
+                                    +'</div>'
+                                    +'<div class="modal-body">'
+                                        +'<div class="form-group">'
+                                            +'<label>Choose</label>'
+                                            +'<select class="form-control '+elem.category.id+'select">'
+                                                +optionString
+                                            +'</select>'
+                                        +'</div>'
+                                        +'<div class="form-group">'
+                                            +'<label>Quantity</label>'
+                                            +'<input type="number" min="1" max="10" class="form-control '+elem.category.id+'input" aria-label="Text input with dropdown button">'
+                                        +'</div>'
+                                        +'<button type="submit" class="btn btn-primary" onclick="addItemIntoCart(\''+elem.category.id+'\''+')" data-dismiss="modal">Add To Cart</button>'
+                                    +'</div>'
+                                +'</div>'
+                            +'</div>';
+            return pDiv;
+        }
+        
+        // This method will add an item into cart
+        function addItemIntoCart(categoryId)
+        {
+            var itemId = $("."+categoryId+"select"+" option:selected").val();
+            var quantity = $("."+categoryId+"input").val();
+            
+            
+            for (var i = 0; i < catItemList.length; i++) {
+                for (var j=0; j < catItemList[i].items.length; j++){
+                    if(catItemList[i].items[j].id === itemId){
+                       var ctItem = new Object();
+                        ctItem.quantity = parseInt(quantity);
+                        ctItem.item = catItemList[i].items[j];
+                        cartItems.push(ctItem);
+                        showCartItemCount();
+                        showCartItemTable();
+                        return;
+                    }
+                }
+            }
+        }
+        
+        // This method will add inner HTML in table div, each time when an item is added into the cart
+        function showCartItemTable()
+        {
+            var tablePanel = document.getElementById("tablePanel");
+            tablePanel.innerHTML = "";
+            if(cartItems.length > 0)
+            {
+                var rowdata = "";
+                var totalAmount = 0;
+                for (var i = 1; i <= cartItems.length; i++) {
+                    var subTotal = (parseInt(cartItems[i-1].quantity)) * (parseInt(cartItems[i-1].item.get("Price")));
+                    totalAmount = totalAmount + subTotal;
+                    rowdata = rowdata + '<tr>'
+                                            +'<td scope="row">'+i+'</td>'
+                                            +'<td>'+cartItems[i-1].item.get("Name")+'</td>'
+                                            +'<td>'+cartItems[i-1].quantity+'</td>'
+                                            +'<td>'+cartItems[i-1].item.get("Price")+'</td>'
+                                            +'<td>'+subTotal+'</td>'
+                                        +'</tr>';
+                }
+                tablePanel.innerHTML = '<table class="table table-hover table-dark">'
+                    +'<thead>'
+                        +'<tr>'
+                            +'<th scope="col">No.</th>'
+                            +'<th scope="col">Name</th>'
+                            +'<th scope="col">Quantity</th>'
+                            +'<th scope="col">Unit/Price</th>'
+                            +'<th scope="col">Amount</th>'
+                        +'</tr>'
+                    +'</thead>'
+                    +'<tbody>'
+                        +rowdata
+                    +'</tbody>'
+                    +'<tfoot>'
+                        +'<tr>'
+                            +'<th colspan="3" scope="col"></th>'
+                            +'<th scope="col">Total Amount</th>'
+                            +'<th scope="col">'+totalAmount+'</th>'
+                        +'</tr>'
+                    +'</tfoot>'
+                +'</table>'
+            }
+            else
+            {
+                var errorDiv = document.createElement("div");
+                errorDiv.className = "alert alert-danger";
+                errorDiv.role = "alert";
+                errorDiv.innerHTML = "Please add something in your cart";
+                tablePanel.appendChild(errorDiv);
+            }
+               
+        }
+        
+        // Show item count in top nave bar's cart link
+        function showCartItemCount()
+        {
+            var badge = document.getElementById("cartBadge");
+            badge.innerHTML = cartItems.length;
+        }
+        
+        // Show item count in top nave bar's the Cart link when page is loaded
+        showCartItemCount();
+        
+        // Show items in table when page is loaded
+        showCartItemTable();
+    </script>
+
+</body>
+</html>

@@ -1,0 +1,37 @@
+[
+        {
+            "Id": "1",
+            "Name": "PIZZA",
+            "URL": "images/portfolio/7.jpg",
+            "Description": "Not all addictions are harmfull"
+        },
+        {
+            "Id": "2",
+            "Name": "SAMOSA",
+            "URL": "images/portfolio/9.jpg",
+            "Description": "All time favorite"
+        },
+        {
+            "Id": "3",
+            "Name": "DOSA",
+            "URL": "images/portfolio/10.jpg",
+            "Description": "A premium south indian dish"
+        },
+        {
+            "Id": "4",
+            "Name": "BURGER",
+            "URL": "images/portfolio/16.jpg",
+            "Description": "We all need to make time for a burger once in a while"
+        },
+        {
+            "Id": "5",
+            "Name": "DESSERT",
+            "URL": "images/portfolio/11.jpg",
+            "Description": "Complete your meal with our delicious desserts"
+        {
+            "Id": "6",
+            "Name": "COFFEE",
+            "URL": "images/portfolio/6.jpg",
+            "Description": "Begin each day with a perfect cup of coffee"
+        }
+]
