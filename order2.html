@@ -33,7 +33,10 @@
     
     <!-- back4app -->
     <script src="https://unpkg.com/parse/dist/parse.min.js"></script>
+    <script type="text/javascript" src="https://cdn.emailjs.com/sdk/2.2.4/email.min.js"></script>
     <script>
+        (function(){emailjs.init("user_8sGnKk68ABTJDav2YwKM4");})();
+        
         //PASTE HERE YOUR Back4App APPLICATION ID AND YOUR JavaScript KEY
         Parse.initialize("ST1zL1OXQ8iM2Od3jQWaHXNmksg5RQQAgMadoXjd", "bUt5oftXiKJonpKKWbvhf3hc4TtOhxikpVxIpEJg");
         Parse.serverURL = "https://parseapi.back4app.com/";
@@ -49,6 +52,23 @@
         var catCount = 0;
         var setItemInvokeCount = 0;
 
+		function getCatagoryItemList()
+		{
+			// This will be the first Query to run
+			var category = Parse.Object.extend("Category");
+			var query = new Parse.Query(category);
+			query.find({
+				success: function(results) {
+					//debugger;
+					categoryList =  JSON.stringify(results);
+					// this method will be called when all the categories are fatched from back4 app asynchronously
+					setCategoryList(results);
+				},
+				error: function(error) {
+					alert("Error: " + error.code + " " + error.message);
+				}
+			});
+		}
         
         // this method will be called when all the items corresponding to a category are fatched from back4app asynchronously
         // in this method we will create a list of object. Each object will hold category and its corresponding items list.
@@ -59,10 +79,12 @@
             var inst = new Object();
             inst.category = catMap.get(itemList[0].get("Category").id.toString());
             inst.items = itemList;
-            catItemList.push(inst);
+            catItemList.push(JSON.stringify(inst));
             if(setItemInvokeCount==catCount)
             {
-                createDynamicComponents(catItemList);
+				catItemList = JSON.stringify(catItemList);
+				sessionStorage.setItem("catItemList", catItemList);
+                createDynamicComponents(JSON.parse(catItemList));
             }
         }
 
@@ -92,25 +114,6 @@
                 });
             }
         }
-
-        // This will be the first Query to run
-        var category = Parse.Object.extend("Category");
-        var query = new Parse.Query(category);
-        query.find({
-            success: function(results) {
-                categoryList =  JSON.stringify(results);
-                // this method will be called when all the categories are fatched from back4 app asynchronously
-                setCategoryList(results);
-            },
-            error: function(error) {
-                alert("Error: " + error.code + " " + error.message);
-            }
-        });
-        
-        
-        
-        
-        
     </script>
     <!-- back4app -->
 </head>
@@ -145,7 +148,7 @@
                     <div class="navbar-collapse  collapse">
                         <ul class="nav navbar-nav navbar-right scroll">
                             <li class="active"><a href="home.html">Home</a></li>
-                            <li class="active"><a href="#">Cart <span class="badge badge-light" id="cartBadge"></span></a></li>
+                            <li class="active"><a href="#gocart">Cart <span class="badge badge-light" id="cartBadge"></span></a></li>
 
                         </ul>
                     </div>
@@ -166,6 +169,7 @@
     
 
 
+<div id=#gocart>
 
     <div>
 
@@ -183,25 +187,25 @@
 
     <div class="row">
         <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3"></div>
-        <div id="addressInfo" class="spacer col-lg-6 col-md-6 col-sm-6 col-xs-6">
+        <div id="customerInfo" class="spacer col-lg-6 col-md-6 col-sm-6 col-xs-6">
             <form>
                 <div class="form-group">
                     <label for="exampleInputEmail1">Name</label>
-                    <input type="text" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" placeholder="Enter your Name" />
+                    <input type="text" class="form-control" id="customerName" placeholder="Enter your Name" />
                 </div>
                 <div class="form-group">
                     <label for="exampleInputEmail1">Email address</label>
-                    <input type="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" placeholder="Enter email" />
+                    <input type="email" class="form-control" id="customerEmail" placeholder="Enter email" />
                 </div>
                 <div class="form-group">
                     <label for="exampleInputEmail1">Address</label>
-                    <input type="text-area" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" />
+                    <input type="text-area" rows="4" class="form-control" id="customerAddress"/>
                 </div>
                 <div class="form-group">
                     <label for="exampleInputEmail1">Mobile Number</label>
-                    <input type="text" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" placeholder="Enter Mobile Number" />
+                    <input type="text" class="form-control" id="customerMobile" placeholder="Enter Mobile Number" />
                 </div>
-                <button type="submit" class="btn btn-primary">Submit</button>
+                <button type="submit" class="btn btn-primary" onclick="createOrder();return false;">Submit</button>
             </form>
         </div>
         <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3"></div>
@@ -209,7 +213,7 @@
 
 
 
-
+</div>
 
 
     <div id="contact" class="spacer">
@@ -285,36 +289,93 @@
 
 
     <script>
+        var itemInsertCount = 0;
+        function createOrder()
+        {
+            var CustomerOrders = Parse.Object.extend("CustomerOrders");
+            var customerOrder = new CustomerOrders();
+
+            var name = $("#customerName").val();
+            var email = $("#customerEmail").val();
+            var address = $("#customerAddress").val();
+            var mobile = $("#customerMobile").val();
+            customerOrder.set("CustomerName", name);
+            customerOrder.set("Email", email);
+            customerOrder.set("Address", address);
+            customerOrder.set("phoneNumber", mobile);
+            customerOrder.set("Date", new Date());
+            customerOrder.set("Status", "Pending");
+
+            customerOrder.save(null, {
+            success: function(customerOrder) {
+                itemInsertCount = 0;
+                for (var i = 0; i < cartItems.length; i++) {
+                    var OrderedItems = Parse.Object.extend("OrderedItems");
+                    var orderedItem = new OrderedItems();
+                    orderedItem.save(null, {
+                        success: function (orderedItem) {
+                            itemInsertCount++;
+                            if(cartItems.length == itemInsertCount)
+                            {
+                                alert('Your Order has been placed, You will receive confirmation email shortly');
+                                sessionStorage.removeItem("cartItems");
+                                var templateParams = {
+                                                        "to_email": ""+$("#customerEmail").val(),
+                                                        "orderId": ""+customerOrder.id,
+                                                        "to_name": ""+$("#customerName").val()
+                                                    };
+                                emailjs.send("pranjal9701_gmail_com", "template_gYR8FhrG", templateParams)
+                                    .then(function(response) {
+                                            //console.log('SUCCESS!', response.status, response.text);
+                                                location.reload();
+                                        }, function(error) {
+                                            //console.log('FAILED...', error);
+                                    });
+                            }
+                        },
+                        error: function (response, error) {
+                        }
+                    });
+                }
+                
+            },
+            error: function(customerOrder, error) {
+                    alert('Failed to create order : ' + error.message);	
+                }
+            });
+        }
+        
         function createDynamicComponents(catItemList)
         {
             var container = document.getElementById("foods");
             container.innerHTML = "";
             for (var i = 0; i < catItemList.length; i++) {
-                var figure = getFigure(catItemList[i].category);
+				
+                var figure = getFigure(JSON.parse(catItemList[i]).category);
                 container.appendChild(figure);
-                var modal = getModal(catItemList[i]);
+                var modal = getModal(JSON.parse(catItemList[i]));
                 container.appendChild(modal);
             }
         }
         
         function getFigure(category) {
             var fig = document.createElement("FIGURE");
-            fig.id = "figCategory" + category.get('DataId');
+            fig.id = "figCategory" + category.DataId;
             fig.className = "effect-oscar  wowload fadeInUp";
 
             var img = document.createElement("img");
-            img.src = category.get('URL');
+            img.src = category.URL;
             fig.appendChild(img);
 
             var figCap = document.createElement("figcaption");
             figCap.innerHTML =
-                ' <h2> ' + category.get('Name') + ' </h2> '
-               + ' <p> ' + category.get('Description') + ' <br> '
+                ' <h2> ' + category.Name + ' </h2> '
+               + ' <p> ' + category.Description + ' <br> '
                + '     <a href="images/portfolio/7.jpg" title="1" data-gallery>View more</a> '
                + '     <br /> '
                + '     <br /> '
                + '     <!-- Trigger the modal with a button --> '
-               + '     <button type="button" class="btn btn-info btn-sm" data-toggle="modal" data-target="#'+category.get('Name')+'Modal'+'">Order Now</button> '
+               + '     <button type="button" class="btn btn-info btn-sm" data-toggle="modal" data-target="#'+category.Name+'Modal'+'">Order Now</button> '
                + ' </p>';
             fig.appendChild(figCap);
 
@@ -324,33 +385,33 @@
         function getModal(elem)
         {
             var pDiv = document.createElement("div");
-            pDiv.id = elem.category.get('Name')+'Modal';
+            pDiv.id = elem.category.Name+'Modal';
             pDiv.className = "modal fade";
             pDiv.role = "dialog";
             
             var optionString = '';
             for(var i=0; i<elem.items.length; i++ ){
-                optionString = optionString + '<option value="'+ elem.items[i].id +'">'+ elem.items[i].get('Name') +' - ₹ ' +elem.items[i].get('Price')+'</option>';
+                optionString = optionString + '<option value="'+ elem.items[i].objectId +'">'+ elem.items[i].Name +' - ₹ ' +elem.items[i].Price+'</option>';
             }
             
             pDiv.innerHTML = '<div class="modal-dialog">'
                                 +'<div class="modal-content">'
                                     +'<div class="modal-header">'
                                         +'<button type="button" class="close" data-dismiss="modal">&times;</button>'
-                                        +'<h4 class="modal-title">'+elem.category.get('Name')+'</h4>'
+                                        +'<h4 class="modal-title">'+elem.category.Name+'</h4>'
                                     +'</div>'
                                     +'<div class="modal-body">'
                                         +'<div class="form-group">'
                                             +'<label>Choose</label>'
-                                            +'<select class="form-control '+elem.category.id+'select">'
+                                            +'<select class="form-control '+elem.category.objectId+'select">'
                                                 +optionString
                                             +'</select>'
                                         +'</div>'
                                         +'<div class="form-group">'
                                             +'<label>Quantity</label>'
-                                            +'<input type="number" min="1" max="10" class="form-control '+elem.category.id+'input" aria-label="Text input with dropdown button">'
+                                            +'<input type="number" min="1" max="10" class="form-control '+elem.category.objectId+'input" aria-label="Text input with dropdown button">'
                                         +'</div>'
-                                        +'<button type="submit" class="btn btn-primary" onclick="addItemIntoCart(\''+elem.category.id+'\''+')" data-dismiss="modal">Add To Cart</button>'
+                                        +'<button type="submit" class="btn btn-primary" onclick="addItemIntoCart(\''+elem.category.objectId+'\''+')" data-dismiss="modal">Add To Cart</button>'
                                     +'</div>'
                                 +'</div>'
                             +'</div>';
@@ -362,15 +423,26 @@
         {
             var itemId = $("."+categoryId+"select"+" option:selected").val();
             var quantity = $("."+categoryId+"input").val();
+            var categoryItemList = JSON.parse(catItemList);
             
-            
-            for (var i = 0; i < catItemList.length; i++) {
-                for (var j=0; j < catItemList[i].items.length; j++){
-                    if(catItemList[i].items[j].id === itemId){
-                       var ctItem = new Object();
+            for (var i = 0; i < categoryItemList.length; i++) {
+                categoryItem = JSON.parse(categoryItemList[i]);
+                for (var j=0; j < categoryItem.items.length; j++){
+                    if(categoryItem.items[j].objectId === itemId){
+                        var ctItem = new Object();
                         ctItem.quantity = parseInt(quantity);
-                        ctItem.item = catItemList[i].items[j];
-                        cartItems.push(ctItem);
+                        ctItem.item = categoryItem.items[j];
+                        cartItemJSON = JSON.stringify(ctItem);
+                        cartItems.push(JSON.parse(cartItemJSON));
+                        
+                        if (typeof(Storage) !== "undefined") {
+                            sessionStorage.setItem("cartItems", JSON.stringify(cartItems));
+                        }
+                        else {
+                            // Sorry! No Web Storage support..
+                            alert("Sorry! No Web Storage support");
+                        }
+                        
                         showCartItemCount();
                         showCartItemTable();
                         return;
@@ -389,14 +461,15 @@
                 var rowdata = "";
                 var totalAmount = 0;
                 for (var i = 1; i <= cartItems.length; i++) {
-                    var subTotal = (parseInt(cartItems[i-1].quantity)) * (parseInt(cartItems[i-1].item.get("Price")));
+                    var subTotal = (parseInt(cartItems[i-1].quantity)) * (parseInt(cartItems[i-1].item.Price));
                     totalAmount = totalAmount + subTotal;
                     rowdata = rowdata + '<tr>'
                                             +'<td scope="row">'+i+'</td>'
-                                            +'<td>'+cartItems[i-1].item.get("Name")+'</td>'
+                                            +'<td>'+cartItems[i-1].item.Name+'</td>'
                                             +'<td>'+cartItems[i-1].quantity+'</td>'
-                                            +'<td>'+cartItems[i-1].item.get("Price")+'</td>'
+                                            +'<td>'+cartItems[i-1].item.Price+'</td>'
                                             +'<td>'+subTotal+'</td>'
+                                            +'<td><span class="glyphicon glyphicon-trash" style="cursor: pointer;" onclick="deleteItemFromCart('+(i-1)+');"></td>'
                                         +'</tr>';
                 }
                 tablePanel.innerHTML = '<table class="table table-hover table-dark">'
@@ -407,6 +480,7 @@
                             +'<th scope="col">Quantity</th>'
                             +'<th scope="col">Unit/Price</th>'
                             +'<th scope="col">Amount</th>'
+                            +'<th scope="col"></th>'
                         +'</tr>'
                     +'</thead>'
                     +'<tbody>'
@@ -432,6 +506,18 @@
                
         }
         
+		function deleteItemFromCart(index)
+		{
+			if(cartItems.length > 0)
+			{
+				cartItems.splice(index,1);
+				sessionStorage.setItem("cartItems", JSON.stringify(cartItems));
+				showCartItemCount();
+				showCartItemTable();
+			}
+		}
+		
+		
         // Show item count in top nave bar's cart link
         function showCartItemCount()
         {
@@ -444,6 +530,28 @@
         
         // Show items in table when page is loaded
         showCartItemTable();
+        
+        
+        $( window ).load(function() {
+			var cil = sessionStorage.getItem("catItemList");
+            if(cil != null || sn != cil)
+			{
+				catItemList = cil;
+                createDynamicComponents(JSON.parse(catItemList));
+			}
+			else
+			{
+				getCatagoryItemList();
+			}
+			
+            var sn = sessionStorage.getItem("cartItems");
+            if(sn != null || sn != undefined)
+            {
+                cartItems = JSON.parse(sn);
+                showCartItemCount();
+                showCartItemTable();
+            }
+        });
     </script>
 
 </body>
