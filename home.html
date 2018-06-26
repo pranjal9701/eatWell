@@ -43,7 +43,7 @@
               username: 'sampeusername',
               email: 'sample@email.com',
               password: '123456'
-            }, {    
+            }, {
               success: function(response) {
                 alert('New object create with success! ObjectId: ' + response.id + `, ` + user.get('username'));
               },
@@ -86,13 +86,15 @@
 
             <!-- Nav Starts -->
             <div class="navbar-collapse  collapse">
+              <ul class="nav navbar-nav navbar-right">
+                 <li ><a href="order2.html">Cart</a></li>
+              </ul>
               <ul class="nav navbar-nav navbar-right scroll">
                  <li class="active"><a href="#home">Home</a></li>
                  <li ><a href="#menu">Menu</a></li>
                  <li ><a href="#foods">Foods</a></li>
                  <li ><a href="#partners">Feedback</a></li>
                  <li ><a href="#contact">Contact</a></li>
-                 <li ><a href="order1.html">Cart</a></li>
               </ul>
             </div>
             <!-- #Nav Ends -->
