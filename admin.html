@@ -1,79 +1,317 @@
 <!doctype html>
 <html lang="en">
-<head>
-    <!-- Required meta tags -->
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+	<head>
+		<!-- Required meta tags -->
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
-    <!-- Bootstrap CSS -->
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" integrity="sha384-WskhaSGFgHYWDcbwN70/dfYBj47jz9qbsMId/iRN3ewGhXQFZCSftd1LZCfmhktB" crossorigin="anonymous">
+		<!-- Bootstrap CSS -->
+		<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" integrity="sha384-WskhaSGFgHYWDcbwN70/dfYBj47jz9qbsMId/iRN3ewGhXQFZCSftd1LZCfmhktB" crossorigin="anonymous">
 
-    <title>Admin Panel</title>
-</head>
-<body>
-    <div class="card text-center">
-      <div class="card-header">
-        <ul class="nav nav-tabs card-header-tabs navbar">
-          <li class="nav-item">
-            <a class="nav-link" href="#">Pending Orders</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="#">Completed Orders</a>
-          </li>
-        </ul>
-      </div>
-    </div>
-    
-    <div class="card-body ">
-        <ul class="list-group list-group-flush">
-          <li class="list-group-item">Order ID:</li>
-          <li class="list-group-item">Customer Name:</li>
-          <li class="list-group-item">Email Address:</li>
-          <li class="list-group-item">Contact Number:</li>
-        </ul>
-    </div>
-    
-    <table class="table">
-      <thead class="thead-light">
-        <tr>
-          <th scope="col">No.</th>
-          <th scope="col">Name</th>
-          <th scope="col">Quantity</th>
-          <th scope="col">Unit/Price</th>
-          <th scope="col">Amount</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <th scope="row">1</th>
-          <td>Chilly Samosa</td>
-          <td>3</td>
-          <td>15</td>
-          <td>45</td>
-        </tr>
-        <tr>
-          <th scope="row">1</th>
-          <td>Chilly Samosa</td>
-          <td>3</td>
-          <td>15</td>
-          <td>45</td>
-        </tr>
-      </tbody>        
-   </table>
-    
-   <div class="card text-center">
-        <div class="card-body">
-            <a href="#" class="btn btn-primary">Accept</a>
-            <a href="#" class="btn btn-primary">Completed</a>
-        </div>
-   </div>
-    
-    <!-- Optional JavaScript -->
-    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
-    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js" integrity="sha384-smHYKdLADwkXOn1EmN1qk/HfnUcbVRZyYmZ4qpPea6sjB/pTJ0euyQp0Mk8ck+5T" crossorigin="anonymous"></script>
-</body>
+		<!-- jquery -->
+		<script src="assets/jquery.js"></script>
+		
+		<!-- Optional JavaScript -->
+		<!-- jQuery first, then Popper.js, then Bootstrap JS -->
+		<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
+		<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js" integrity="sha384-smHYKdLADwkXOn1EmN1qk/HfnUcbVRZyYmZ4qpPea6sjB/pTJ0euyQp0Mk8ck+5T" crossorigin="anonymous"></script>
+
+		<!-- back4app -->
+		<script src="https://unpkg.com/parse/dist/parse.min.js"></script>
+		<script type="text/javascript" src="https://cdn.emailjs.com/sdk/2.2.4/email.min.js"></script>
+		<title>Admin Panel</title>
+	</head>
+	<body>
+		<script>
+			(function(){emailjs.init("user_8sGnKk68ABTJDav2YwKM4");})();
+			
+			Parse.initialize("ST1zL1OXQ8iM2Od3jQWaHXNmksg5RQQAgMadoXjd", "bUt5oftXiKJonpKKWbvhf3hc4TtOhxikpVxIpEJg");
+			Parse.serverURL = "https://parseapi.back4app.com/";
+			
+			var customerOrderMap = new Map();
+			var customerPendingOrders = [];
+			var customerCompletedOrders = [];
+			function getOrder()
+			{
+				var order = Parse.Object.extend("CustomerOrders");
+				var query = new Parse.Query(order);
+				query.find({
+					success: function(results) {
+						for(var i=0; i < results.length; i++)
+						{
+							var order = JSON.stringify(results[i]);
+							order = JSON.parse(order);
+							order.items = [];
+							//order.items.push("test");
+							//console.log(order);
+							customerOrderMap.set(order.objectId, order);
+						}
+						getItems();
+					},
+					error: function(error) {
+					}
+				});
+			}
+			function getItems()
+			{
+				//console.log(customerOrderMap);
+				var items = Parse.Object.extend("OrderedItems");
+				var query = new Parse.Query(items);
+				query.include("item");
+				query.find({
+					success: function(results) {
+						for(var i=0; i < results.length; i++)
+						{
+							var orderItem = JSON.stringify(results[i]);
+							orderItem = JSON.parse(orderItem);
+							//order.items.push("test");
+							//console.log(orderItem);
+							var order = customerOrderMap.get(orderItem.customerOrderid);
+							//console.log(orderItem.customerOrderid);
+							order.items.push(orderItem);
+							customerOrderMap.set(order.objectId, order);
+							//console.log(order);
+						}
+						createPendingCompleteList();
+					},
+					error: function(error) {
+					}
+				});
+			}
+			function createPendingCompleteList()
+			{	
+				var orderItrater = customerOrderMap.values();
+				for (var [key, value] of customerOrderMap) {
+					//console.log(value);
+					//console.log(value.Status == "Pending");
+					if(value.Status == "Pending")
+						customerPendingOrders.push(value);
+					else if(value.Status == "Completed")
+						customerCompletedOrders.push(value);
+				}
+				//console.log(customerPendingOrders);
+				createOrderPanel();
+			}
+			
+			function createOrderPanel()
+			{
+				var pendingOrdersPanel = document.getElementById("pendingOrdersPanel");
+				pendingOrdersPanel.innerHTML = "<br/>";
+				for(var i=0; i<customerPendingOrders.length; i++)
+				{
+					pendingOrdersPanel.appendChild(createOrderCard(customerPendingOrders[i], "Pending"));
+					//console.log(createOrderCard(customerPendingOrders[i], "Pending"));
+				}
+				
+				var completedOrdersPanel = document.getElementById("completedOrdersPanel");
+				completedOrdersPanel.innerHTML = "<br/>";
+				for(var i=0; i<customerCompletedOrders.length; i++)
+				{
+					completedOrdersPanel.appendChild(createOrderCard(customerCompletedOrders[i], "Completed"));
+				}
+			}
+			
+			function createOrderCard(customerOrderObject, status)
+			{
+				var tableBody = '';
+				var tAmount = 0;
+				var bg = '';
+				var showCompletedButton = 'none';
+				if(status=="Pending")
+				{
+					bg = 'bg-secondary';
+					showCompletedButton = 'block'
+				}
+				else if(status=="Completed")
+					bg = 'bg-success';
+				for(var i=0; i<customerOrderObject.items.length; i++)
+				{
+					var subtotal = (parseInt(customerOrderObject.items[i].quantity))*(customerOrderObject.items[i].item.Price);
+					tAmount += (parseInt(customerOrderObject.items[i].quantity))*(customerOrderObject.items[i].item.Price);
+					tableBody = tableBody +'<tr>'
+									+'<th scope="row">'+(i+1)+'</th>'
+									+'<td>'+customerOrderObject.items[i].item.Name+'</td>'
+									+'<td>'+customerOrderObject.items[i].quantity+'</td>'
+									+'<td>'+customerOrderObject.items[i].item.Price+'</td>'
+									+'<td>'+subtotal+'</td>'
+								+'</tr>';
+				}
+				var orderDiv = document.createElement("div");
+				orderDiv.className = "row";
+				orderDiv.innerHTML = '<div class="col-lg-1 col-md-1 col-sm-1 col-xs-1"></div>'
+									+'<div class="card text-white '+bg+' mb-3 col-lg-10 col-md-10 col-sm-10 col-xs-10">'
+										+'<div class="card-header" >'
+											+'<ul class="list-group list-group-flush">'
+												+'<li class="list-group-item '+bg+'">Order ID: '+customerOrderObject.objectId+'</li>'
+												+'<li class="list-group-item '+bg+'">Order Status: '+customerOrderObject.Status+'</li>'
+												+'<li class="list-group-item '+bg+'">Customer Name: '+customerOrderObject.CustomerName+'</li>'
+												+'<li class="list-group-item '+bg+'">Address: '+customerOrderObject.Address+'</li>'
+												+'<li class="list-group-item '+bg+'">Contact Number: '+customerOrderObject.phoneNumber+'</li>'
+											+'</ul>'
+										+'</div>'
+										+'<div class="card-body">'
+											+'<h5 class="card-title" style="font-weight: bold">Item List</h5>'
+											+'<table class="table">'
+												+'<thead class="thead-light">'
+													+'<tr>'
+														+'<th scope="col">No.</th>'
+														+'<th scope="col">Name</th>'
+														+'<th scope="col">Quantity</th>'
+														+'<th scope="col">Unit/Price</th>'
+														+'<th scope="col">Amount</th>'
+													+'</tr>'
+												+'</thead>'
+												+'<tbody>'
+													+tableBody
+												+'</tbody>'
+												+'<tfoot>'
+													+'<tr>'
+														+'<th colspan="3" scope="col"></th>'
+														+'<th scope="col">Total Amount</th>'
+														+'<th scope="col">'+tAmount+'</th>'
+													+'</tr>'
+												+'</tfoot>'
+											+'</table>'
+										+'</div>'
+										+'<div class="text-center" style="display:'+showCompletedButton+'">'
+											+'<a href="#" class="btn btn-primary" onclick="changeOrderStatus(\''+customerOrderObject.objectId.trim()+'\');return false;">Completed</a>'
+											+'<br/>'
+									   +'</div>'
+									+'</div>'
+									+'<div class="col-lg-1 col-md-1 col-sm-1 col-xs-1"></div>';
+				return orderDiv;
+			}
+			
+			function changeOrderStatus(orderId)
+			{
+				var customerOrders = Parse.Object.extend("CustomerOrders");
+				var query = new Parse.Query(customerOrders);
+				query.equalTo("objectId", orderId);
+				query.first({
+					success: function(results) {
+						results.set("Status", "Completed");
+						results.save();
+						for(var i=0; i<customerPendingOrders.length; i++)
+						{
+							if(customerPendingOrders[i].objectId === orderId)
+							{
+								var order = customerPendingOrders[i];
+								order.Status = "Completed";
+								customerCompletedOrders.push(order);
+								
+								customerPendingOrders.splice(i, 1);
+								createOrderPanel();
+								//console.log(order.Email);
+								//console.log(order.objectId);
+								//console.log(order.CustomerName);
+								var templateParams = {
+														"to_email": ""+order.Email,
+														"orderId": ""+order.objectId,
+														"to_name": ""+order.CustomerName
+													};
+								emailjs.send("pranjal9701_gmail_com", "eatwell_order_completed_template", templateParams)
+									.then(function(response) {
+											console.log('SUCCESS!', response.status, response.text);
+										}, function(error) {
+											console.log('FAILED...', error);
+									});
+							}
+						}
+					},
+					error: function(error) {
+					}
+				});
+			}
+		</script>
+		<div class="card text-center">
+		  <div class="card-header">
+			<ul class="nav nav-tabs card-header-tabs navbar">
+			  <li class="nav-item">
+				<a class="nav-link" onclick="showPendingOrders();">Pending Orders</a>
+			  </li>
+			  <li class="nav-item">
+				<a class="nav-link" onclick="showCompletedOrders();">Completed Orders</a>
+			  </li>
+			</ul>
+		  </div>
+		</div>
+		
+		
+		<div id="pendingOrdersPanel" style="display:block;">
+	    </div>
+		<div id="completedOrdersPanel" style="display:none;">
+	    </div>
+		
+		<!--<div class="row">
+			<div class="col-lg-1 col-md-1 col-sm-1 col-xs-1"></div>
+			
+			<div class="card text-white bg-dark mb-3 col-lg-10 col-md-10 col-sm-10 col-xs-10">
+			<div class="card-header">
+				<ul class="list-group list-group-flush">
+				  <li class="list-group-item bg-dark">Order ID:</li>
+				  <li class="list-group-item bg-dark">Customer Name:</li>
+				  <li class="list-group-item bg-dark">Email Address:</li>
+				  <li class="list-group-item bg-dark">Contact Number:</li>
+				</ul>
+			</div>
+			<div class="card-body">
+				<h5 class="card-title">Item List</h5>
+				<table class="table">
+					<thead class="thead-light">
+						<tr>
+							<th scope="col">No.</th>
+							<th scope="col">Name</th>
+							<th scope="col">Quantity</th>
+							<th scope="col">Unit/Price</th>
+							<th scope="col">Amount</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr>
+							<th scope="row">1</th>
+							<td>Chilly Samosa</td>
+							<td>3</td>
+							<td>15</td>
+							<td>45</td>
+						</tr>
+						<tr>
+							<th scope="row">1</th>
+							<td>Chilly Samosa</td>
+							<td>3</td>
+							<td>15</td>
+							<td>45</td>
+						</tr>
+					</tbody>        
+				</table>
+			</div>
+			<div class="text-center">
+				<a href="#" class="btn btn-primary">Accept</a>
+				<a href="#" class="btn btn-primary">Completed</a>
+		   </div>
+		</div>
+			
+			<div class="col-lg-1 col-md-1 col-sm-1 col-xs-1"></div>
+		</div>-->
+		
+		<script>
+			function showPendingOrders()
+			{
+				$("#pendingOrdersPanel").css("display", "block");
+				$("#completedOrdersPanel").css("display", "none");
+			}
+			
+			function showCompletedOrders()
+			{
+				$("#pendingOrdersPanel").css("display", "none");
+				$("#completedOrdersPanel").css("display", "block");
+			}
+		
+			$(document).ready(function() {
+				getOrder();
+			});
+		</script>
+    </body>
 </html>
 
 

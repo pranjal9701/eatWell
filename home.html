@@ -30,32 +30,93 @@
 
 
 <link rel="stylesheet" href="assets/style.css">
+
     
     <!-- back4app -->
+    <script src="https://unpkg.com/parse/dist/parse.min.js"></script>
+    <script type="text/javascript" src="https://cdn.emailjs.com/sdk/2.2.4/email.min.js"></script>
+    <script>
+        (function(){emailjs.init("user_8sGnKk68ABTJDav2YwKM4");})();
+        
+        //PASTE HERE YOUR Back4App APPLICATION ID AND YOUR JavaScript KEY
+        Parse.initialize("ST1zL1OXQ8iM2Od3jQWaHXNmksg5RQQAgMadoXjd", "bUt5oftXiKJonpKKWbvhf3hc4TtOhxikpVxIpEJg");
+        Parse.serverURL = "https://parseapi.back4app.com/";
+        
+        // This list will hold all the items which are added into the cart.
+        var cartItems = [];
+        
+        // This is used to hold the Category and its corresponding items into a single object list.
+        var catItemList = [];
+        
+        // This map will be used to refer categories according to their id
+        var catMap = new Map();
+        var catCount = 0;
+        var setItemInvokeCount = 0;
 
-<script src="https://unpkg.com/parse/dist/parse.min.js"></script>
-    
-<script>
-        /*Parse.initialize("zod6EEdbf6EOaxZG1qPhsD7ErFb8ZVD95y20zpL0", "D7jHFhKrtM2fI8Adb7QGIFTevxn4EhuUJZY9fkHw"); //PASTE HERE YOUR Back4App APPLICATION ID AND YOUR JavaScript KEY
-    
-                var user = new Parse.User();
-            user.save({
-              username: 'sampeusername',
-              email: 'sample@email.com',
-              password: '123456'
-            }, {
-              success: function(response) {
-                alert('New object create with success! ObjectId: ' + response.id + `, ` + user.get('username'));
-              },
-              error: function(response, error) {
-                alert('Error: ' + error.message);
-              }
-            });
-    
-        Parse.serverURL = "https://parseapi.back4app.com/";*/
-</script>
-    
-<!-- back4app -->
+		function getCatagoryItemList()
+		{
+			// This will be the first Query to run
+			var category = Parse.Object.extend("Category");
+			var query = new Parse.Query(category);
+			query.find({
+				success: function(results) {
+					//debugger;
+					categoryList =  JSON.stringify(results);
+					// this method will be called when all the categories are fatched from back4 app asynchronously
+					setCategoryList(results);
+				},
+				error: function(error) {
+					alert("Error: " + error.code + " " + error.message);
+				}
+			});
+		}
+        
+        // this method will be called when all the items corresponding to a category are fatched from back4app asynchronously
+        // in this method we will create a list of object. Each object will hold category and its corresponding items list.
+        // after the object list is created, createDynamicComponents() method will be called and it will create all the HTML components.
+        function setItemList(itemList)
+        {
+            setItemInvokeCount++;
+            var inst = new Object();
+            inst.category = catMap.get(itemList[0].get("Category").id.toString());
+            inst.items = itemList;
+            catItemList.push(JSON.stringify(inst));
+            if(setItemInvokeCount==catCount)
+            {
+				catItemList = JSON.stringify(catItemList);
+				sessionStorage.setItem("catItemList", catItemList);
+                createDynamicComponents(JSON.parse(catItemList));
+            }
+        }
+
+        // this method will be called when all the categories are fatched from back4 app asynchronously
+        function setCategoryList(categoryList)
+        {
+            catCount = categoryList.length;
+            for (var i = 0; i < categoryList.length; i++) {
+                var object = categoryList[i];
+                
+                catMap.set(object.id, object);
+            }
+            for (var i = 0; i < categoryList.length; i++) {
+                var object = categoryList[i];
+                
+                var item = Parse.Object.extend("Item");
+                var innerQuery = new Parse.Query(item);
+                innerQuery.equalTo("Category", object);
+                innerQuery.find({
+                    success: function(results) {
+                        // this method will be called when all the items corresponding to a category are fatched from back4app asynchronously
+                        setItemList(results);
+                    },
+                    error: function(error) {
+                        alert("Error: " + error.code + " " + error.message);
+                    }
+                });
+            }
+        }
+    </script>
+    <!-- back4app -->
     
 </head>
 
@@ -87,12 +148,11 @@
             <!-- Nav Starts -->
             <div class="navbar-collapse  collapse">
               <ul class="nav navbar-nav navbar-right">
-                 <li ><a href="order2.html">Cart</a></li>
+                 <li ><a href="order2.html">Cart <span class="badge badge-light" id="cartBadge"></span></a></li>
               </ul>
               <ul class="nav navbar-nav navbar-right scroll">
                  <li class="active"><a href="#home">Home</a></li>
                  <li ><a href="#menu">Menu</a></li>
-                 <li ><a href="#foods">Foods</a></li>
                  <li ><a href="#partners">Feedback</a></li>
                  <li ><a href="#contact">Contact</a></li>
               </ul>
@@ -278,276 +338,6 @@
 <!-- #Cirlce Ends -->
 
 
-<!-- works -->
-<div id="foods"  class=" clearfix grid"> 
-    <figure class="effect-oscar  wowload fadeInUp">
-        <img src="images/portfolio/7.jpg" alt="img01"/>
-        <figcaption>
-            <h2>PIZZA</h2>
-            <p>Not all addictions are harmfull<br>
-            <a href="images/portfolio/7.jpg" title="1" data-gallery>View more</a>
-            <br/>
-            <br/>
-            <!-- Trigger the modal with a button -->
-            <button type="button" class="btn btn-info btn-sm" data-toggle="modal" data-target="#pizzaModal">Order Now</button>
-            
-            </p>            
-        </figcaption>
-    </figure>
-     <figure class="effect-oscar  wowload fadeInUp">
-        <img src="images/portfolio/9.jpg" alt="img01"/>
-        <figcaption>
-            <h2>SAMOSA</h2>
-            <p>All time favorite<br>
-            <a href="images/portfolio/9.jpg" title="1" data-gallery>View more</a>
-            <br/>
-            <br/>
-            <!-- Trigger the modal with a button -->
-            <button type="button" class="btn btn-info btn-sm" data-toggle="modal" data-target="#samosaModal">Order Now</button>
-                
-            </p>            
-        </figcaption>
-    </figure>
-     <figure class="effect-oscar  wowload fadeInUp">
-        <img src="images/portfolio/10.jpg" alt="img01"/>
-        <figcaption>
-            <h2>DOSA</h2>
-            <p>A premium south indian dish<br>
-            <a href="images/portfolio/10.jpg" title="1" data-gallery>View more</a>
-            <br/>
-            <br/>
-            <!-- Trigger the modal with a button -->
-            <button type="button" class="btn btn-info btn-sm" data-toggle="modal" data-target="#dosaModal">Order Now</button>
-            
-            </p>            
-        </figcaption>
-    </figure>
-     <figure class="effect-oscar  wowload fadeInUp">
-        <img src="images/portfolio/16.jpg" alt="img01"/>
-        <figcaption>
-            <h2>BURGER</h2>
-            <p>We all need to make time for a burger once in a while<br>
-            <a href="images/portfolio/16.jpg" title="1" data-gallery>View more</a>
-            <br/>
-            <br/>
-            <!-- Trigger the modal with a button -->
-            <button type="button" class="btn btn-info btn-sm" data-toggle="modal" data-target="#burgerModal">Order Now</button>
-            
-            </p>            
-        </figcaption>
-    </figure>
-     
-     <figure class="effect-oscar  wowload fadeInUp">
-        <img src="images/portfolio/11.jpg" alt="img01"/>
-        <figcaption>
-            <h2>DESSERT</h2>
-            <p>Complete your meal with our delicious desserts<br>
-            <a href="images/portfolio/11.jpg" title="1" data-gallery>View more</a>
-            <br/>
-            <br/>
-            <!-- Trigger the modal with a button -->
-            <button type="button" class="btn btn-info btn-sm" data-toggle="modal" data-target="#dessertModal">Order Now</button>
-            
-            </p>            
-        </figcaption>
-    </figure>
-    <figure class="effect-oscar  wowload fadeInUp">
-        <img src="images/portfolio/6.jpg" alt="img01"/>
-        <figcaption>
-            <h2>COFFEE</h2>
-            <p>Begin each day with a perfect cup of coffee<br>
-            <a href="images/portfolio/6.jpg" title="1" data-gallery>View more</a>
-            <br/>
-            <br/>
-            <!-- Trigger the modal with a button -->
-            <button type="button" class="btn btn-info btn-sm" data-toggle="modal" data-target="#coffeeModal">Order Now</button>
-            
-            </p>            
-        </figcaption>
-    </figure>     
-</div>
-    
-<!-- works -->
-    
-<!-- Pizza Modal -->
-<div class="modal fade" id="pizzaModal" role="dialog">
-    <div class="modal-dialog">
-
-        <!-- Modal content-->
-        <div class="modal-content">
-            <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal">&times;</button>
-                <h4 class="modal-title">Pizza</h4>
-            </div>
-            <div class="modal-body">
-                <div class="form-group">
-                    <label>Choose</label>
-                    <select class="form-control">
-                        <option>Onion Tomato Capsicum Pizza</option>
-                        <option>Mexican Green Wave</option>
-                        <option>Spicy Paneer</option>
-                        <option>Farm House</option>
-                        <option>EatWell Special Pizza</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label>Quantity</label>
-                    <input type="number" min="1" max="10" class="form-control" aria-label="Text input with dropdown button">
-                </div>
-                <button type="submit" class="btn btn-primary">Add To Cart</button>
-            </div>
-        </div>
-    </div>
-</div>
-<!-- Samosa Modal -->
-<div class="modal fade" id="samosaModal" role="dialog">
-    <div class="modal-dialog">
-
-        <!-- Modal content-->
-        <div class="modal-content">
-            <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal">&times;</button>
-                <h4 class="modal-title">Samosa</h4>
-            </div>
-            <div class="modal-body">
-                <div class="form-group">
-                    <label>Choose</label>
-                    <select class="form-control">
-                        <option>Plain Samosa</option>
-                        <option>Aloo Samosa</option>
-                        <option>Chilly Samosa</option>
-                        <option>EatWell Special Samosa</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label>Quantity</label>
-                    <input type="number" min="1" max="10" class="form-control" aria-label="Text input with dropdown button">
-                </div>
-                <button type="submit" class="btn btn-primary">Add To Cart</button>
-            </div>
-        </div>
-    </div>
-</div>
-<!-- Dosa Modal -->
-<div class="modal fade" id="dosaModal" role="dialog">
-    <div class="modal-dialog">
-
-       <!-- Modal content-->
-        <div class="modal-content">
-            <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal">&times;</button>
-                <h4 class="modal-title">Dosa</h4>
-            </div>
-            <div class="modal-body">
-                <div class="form-group">
-                    <label>Choose</label>
-                    <select class="form-control">
-                        <option>Plain Dosa</option>
-                        <option>Paneer Dosa</option>
-                        <option>Mysoor Dosa</option>
-                        <option>Cheese Masala Dosa</option>
-                        <option>Desi Ghee Dosa</option>
-                        <option>EatWell Special Dosa</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label>Quantity</label>
-                    <input type="number" min="1" max="10" class="form-control" aria-label="Text input with dropdown button">
-                </div>
-                <button type="submit" class="btn btn-primary">Add To Cart</button>
-            </div>
-        </div>
-    </div>
-</div>
-<!-- Burger Modal -->
-<div class="modal fade" id="burgerModal" role="dialog">
-    <div class="modal-dialog">
-
-        <!-- Modal content-->
-        <div class="modal-content">
-            <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal">&times;</button>
-                <h4 class="modal-title">Burger</h4>
-            </div>
-            <div class="modal-body">
-                <div class="form-group">
-                    <label>Choose</label>
-                    <select class="form-control">
-                        <option>Aloo Tikki Burger</option>
-                        <option>Veggi Special Burger</option>
-                        <option>Double Tikki Burger</option>
-                        <option>Extra Cheese Burger</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label>Quantity</label>
-                    <input type="number" min="1" max="10" class="form-control" aria-label="Text input with dropdown button">
-                </div>
-                <button type="submit" class="btn btn-primary">Add To Cart</button>
-            </div>
-        </div>
-    </div>
-</div>
-<!-- Dessert Modal -->
-<div class="modal fade" id="dessertModal" role="dialog">
-    <div class="modal-dialog">
-
-        <!-- Modal content-->
-        <div class="modal-content">
-            <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal">&times;</button>
-                <h4 class="modal-title">Dessert</h4>
-            </div>
-            <div class="modal-body">
-                <div class="form-group">
-                    <label>Choose</label>
-                    <select class="form-control">
-                        <option>Chocolate Truffle</option>
-                        <option>Vanilla Pastry</option>
-                        <option>Choco Lava Cake</option>
-                        <option>Frost Bite Ice Cream</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label>Quantity</label>
-                    <input type="number" min="1" max="10" class="form-control" aria-label="Text input with dropdown button">
-                </div>
-                <button type="submit" class="btn btn-primary">Add To Cart</button>
-            </div>
-        </div>
-    </div>
-</div>
-<!-- Coffee Modal -->
-<div class="modal fade" id="coffeeModal" role="dialog">
-    <div class="modal-dialog">
-
-        <!-- Modal content-->
-        <div class="modal-content">
-            <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal">&times;</button>
-                <h4 class="modal-title">Coffee</h4>
-            </div>
-            <div class="modal-body">
-                <div class="form-group">
-                    <label>Choose</label>
-                    <select class="form-control">
-                        <option>Dark Coffee</option>
-                        <option>Espresso</option>
-                        <option>Ristretto</option>
-                        <option>Cappuccino</option>
-                        <option>Cafe Latte</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label>Quantity</label>
-                    <input type="number" min="1" max="10" class="form-control" aria-label="Text input with dropdown button">
-                </div>
-                <button type="submit" class="btn btn-primary">Add To Cart</button>
-            </div>
-        </div>
-    </div>
-</div>
-    
     
 
 <div id="partners" class="container spacer ">
@@ -735,7 +525,23 @@ Copyright 2018 EatWell Cafe & Restaurant. All rights reserved.
 
 
 <!-- custom script -->
-<script src="assets/script.js"></script>
+<script>
+	// Show item count in top nave bar's cart link
+	function showCartItemCount()
+	{
+		var badge = document.getElementById("cartBadge");
+		badge.innerHTML = cartItems.length;
+	}
+	showCartItemCount();
+	$( window ).load(function() {
+		var sn = sessionStorage.getItem("cartItems");
+		if(sn != null || sn != undefined)
+		{
+			cartItems = JSON.parse(sn);
+			showCartItemCount();
+		}
+	});
+</script>
 
 </body>
 </html>

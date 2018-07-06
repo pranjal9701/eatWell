@@ -59,7 +59,6 @@
 			var query = new Parse.Query(category);
 			query.find({
 				success: function(results) {
-					//debugger;
 					categoryList =  JSON.stringify(results);
 					// this method will be called when all the categories are fatched from back4 app asynchronously
 					setCategoryList(results);
@@ -113,6 +112,58 @@
                     }
                 });
             }
+        }
+		
+		var customerOrder;
+		function getOrder(orderId)
+		{
+			var order = Parse.Object.extend("CustomerOrders");
+			var query = new Parse.Query(order);
+			query.equalTo("objectId", orderId);
+			//console.log('1');
+			query.find({
+				success: function(results) {
+					if(results != undefined && results.length > 0)
+					{
+						customerOrder =  JSON.stringify(results[0]);
+						//console.log('2');
+						//console.log(customerOrder);
+						// this method will be called when all the categories are fatched from back4 app asynchronously
+						getItems(results[0]);
+					}
+					else{
+						showTrackOrderError();
+					}
+				},
+				error: function(error) {
+					showTrackOrderError();
+				}
+			});
+		}
+        function getItems(custmOrder)
+        {
+            var items = Parse.Object.extend("OrderedItems");
+			var query = new Parse.Query(items);
+			query.equalTo("customerOrderid", custmOrder.id);
+			query.include("item");
+			query.find({
+				success: function(results) {
+					if(results != undefined)
+					{
+						customerOrder = JSON.parse(customerOrder);
+						customerOrder.items = results;
+						customerOrder = JSON.stringify(customerOrder);
+						//console.log(customerOrder);
+						showTrackOrderDiv();
+					}
+					else{
+						showTrackOrderError();
+					}
+				},
+				error: function(error) {
+					showTrackOrderError();
+				}
+			});
         }
     </script>
     <!-- back4app -->
@@ -241,7 +292,28 @@
     </div>
     <!--Contact Ends-->
 
-
+	<div id="trackOrder">
+		<h2 class="text-center  wowload fadeInUp">Track your Order</h2>
+		<div class="row">
+			<div class="col-lg-3 col-md-3 col-sm-3 col-xs-1"></div>
+			<div class="col-lg-6 col-md-6 col-sm-6 col-xs-">
+				<form>
+					<div class="form-group">
+						<label for="orderId">Order ID</label>
+						<input type="text" class="form-control" id="orderId" placeholder="Enter Order ID" />
+					</div>
+					<button type="submit" class="btn btn-primary" onclick="trackOrder();return false;">Submit</button>
+				</form>
+			</div>
+			<div class="col-lg-3 col-md-3 col-sm-3 col-xs-1"></div>
+		</div>
+		<div class="row" style="margin:10px;">
+			<div class="col-lg-2 col-md-2 col-sm-2 col-xs-1"></div>
+			<div id="orderInfo" class="col-lg-8 col-md-8 col-sm-8 col-xs-">
+			</div>
+			<div class="col-lg-2 col-md-2 col-sm-2 col-xs-1"></div>
+		</div>
+	</div>
 
     <!-- Footer Starts -->
     <div class="footer text-center spacer">
@@ -299,21 +371,28 @@
             var email = $("#customerEmail").val();
             var address = $("#customerAddress").val();
             var mobile = $("#customerMobile").val();
+			var order = $("#orderId").val();
             customerOrder.set("CustomerName", name);
             customerOrder.set("Email", email);
             customerOrder.set("Address", address);
             customerOrder.set("phoneNumber", mobile);
             customerOrder.set("Date", new Date());
             customerOrder.set("Status", "Pending");
-
+			customerOrder.set("orderId", order);
             customerOrder.save(null, {
             success: function(customerOrder) {
                 itemInsertCount = 0;
                 for (var i = 0; i < cartItems.length; i++) {
+					var item = Parse.Object.extend("Item");
+					var itemInst = new item();
+					itemInst.id = cartItems[i].item.objectId;
                     var OrderedItems = Parse.Object.extend("OrderedItems");
                     var orderedItem = new OrderedItems();
+					orderedItem.set("customerOrderid", customerOrder.id);
+					orderedItem.set("quantity", ""+cartItems[i].quantity);
+					orderedItem.set("item", itemInst);
                     orderedItem.save(null, {
-                        success: function (orderedItem) {
+                        success: function (result) {
                             itemInsertCount++;
                             if(cartItems.length == itemInsertCount)
                             {
@@ -409,7 +488,7 @@
                                         +'</div>'
                                         +'<div class="form-group">'
                                             +'<label>Quantity</label>'
-                                            +'<input type="number" min="1" max="10" class="form-control '+elem.category.objectId+'input" aria-label="Text input with dropdown button">'
+                                            +'<input type="number" value="1" min="1" max="10" class="form-control '+elem.category.objectId+'input" aria-label="Text input with dropdown button">'
                                         +'</div>'
                                         +'<button type="submit" class="btn btn-primary" onclick="addItemIntoCart(\''+elem.category.objectId+'\''+')" data-dismiss="modal">Add To Cart</button>'
                                     +'</div>'
@@ -531,7 +610,85 @@
         // Show items in table when page is loaded
         showCartItemTable();
         
+		function trackOrder()
+		{
+			var orderId = $("#orderId").val();
+			//console.log('--'+orderId);
+			if(orderId != null && orderId != undefined && orderId != "")
+			{
+				//console.log('-andar-'+orderId);
+				getOrder(orderId);
+			}
+		}
         
+		function showTrackOrderError()
+		{
+			var orderInfo = document.getElementById("orderInfo");
+			orderInfo.innerHTML = "<br/>";
+			var errorDiv = document.createElement("div");
+			errorDiv.className = "alert alert-danger";
+			errorDiv.role = "alert";
+			errorDiv.innerHTML = "Invalid Order Id";
+			orderInfo.appendChild(errorDiv);
+		}
+        
+		function showTrackOrderDiv()
+		{
+			var customerOrderObject = JSON.parse(customerOrder);
+			var tableBody = '';
+			var tAmount = 0;
+			//console.log(customerOrderObject);
+			//console.log('customerOrderObject.items.length '+customerOrderObject.items.length);
+			for(var i=0; i<customerOrderObject.items.length; i++)
+			{
+				var subtotal = (parseInt(customerOrderObject.items[i].quantity))*(customerOrderObject.items[i].item.Price);
+				tAmount += (parseInt(customerOrderObject.items[i].quantity))*(customerOrderObject.items[i].item.Price);
+				tableBody = tableBody +'<tr>'
+								+'<th scope="row">'+(i+1)+'</th>'
+								+'<td>'+customerOrderObject.items[i].item.Name+'</td>'
+								+'<td>'+customerOrderObject.items[i].quantity+'</td>'
+								+'<td>'+customerOrderObject.items[i].item.Price+'</td>'
+								+'<td>'+subtotal+'</td>'
+							+'</tr>';
+			}
+			var orderInfo = document.getElementById("orderInfo");
+			orderInfo.innerHTML = "<br/>";
+			var orderDiv = document.createElement("div");
+			orderDiv.className = "card border-primary mb-3";
+			orderDiv.innerHTML = '<div class="card-header" style="border: 1px solid;">'
+									+'<h4 class="card-title">Order ID: '+customerOrderObject.objectId+'</h5>'
+									+'<h4 class="card-title">Order Status: '+customerOrderObject.Status+'</h5>'
+									+'<h4 class="card-title">Customer Name: '+customerOrderObject.CustomerName+'</h5>'
+									+'<h4 class="card-title">Address: '+customerOrderObject.Address+'</h5>'
+									+'<h4 class="card-title">Contact Number: '+customerOrderObject.phoneNumber+'</h5>'
+								+'</div>'
+								+'<div class="card-body">'
+									+'<h5 class="card-title" style="font-weight: bold">Item List</h5>'
+									+'<table class="table">'
+										+'<thead class="thead-light">'
+											+'<tr>'
+												+'<th scope="col">No.</th>'
+												+'<th scope="col">Name</th>'
+												+'<th scope="col">Quantity</th>'
+												+'<th scope="col">Unit/Price</th>'
+												+'<th scope="col">Amount</th>'
+											+'</tr>'
+										+'</thead>'
+										+'<tbody>'
+											+tableBody
+										+'</tbody>'
+										+'<tfoot>'
+											+'<tr>'
+												+'<th colspan="3" scope="col"></th>'
+												+'<th scope="col">Total Amount</th>'
+												+'<th scope="col">'+tAmount+'</th>'
+											+'</tr>'
+										+'</tfoot>'
+									+'</table>'
+								+'</div>';
+			orderInfo.appendChild(orderDiv);
+		}
+		
         $( window ).load(function() {
 			var cil = sessionStorage.getItem("catItemList");
             if(cil != null || sn != cil)
