@@ -7,9 +7,12 @@
     <title>EatWell</title>
 
     <!-- Google fonts -->
-    <link href='http://fonts.googleapis.com/css?family=Roboto:400,300,700' rel='stylesheet' type='text/css'>
-    <link href='http://fonts.googleapis.com/css?family=Lobster' rel='stylesheet' type='text/css'>
-    <link href='http://fonts.googleapis.com/css?family=Josefin+Sans:600' rel='stylesheet' type='text/css'>
+    <!--<link href='http://fonts.googleapis.com/css?family=Roboto:400,300,700' rel='stylesheet' type='text/css'>-->
+    <link href='css/familyRoboto.css' rel='stylesheet' type='text/css'>
+    <!--<link href='http://fonts.googleapis.com/css?family=Lobster' rel='stylesheet' type='text/css'>-->
+    <link href='css/familyLobster.css' rel='stylesheet' type='text/css'>
+    <!--<link href='http://fonts.googleapis.com/css?family=Josefin+Sans:600' rel='stylesheet' type='text/css'>-->
+    <link href='css/familyJosefin+Sans.css' rel='stylesheet' type='text/css'>
 
     <!-- font awesome -->
     <!-- <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css" rel="stylesheet"> -->
@@ -32,8 +35,10 @@
     <link rel="stylesheet" href="assets/style.css">
     
     <!-- back4app -->
-    <script src="https://unpkg.com/parse/dist/parse.min.js"></script>
-    <script type="text/javascript" src="https://cdn.emailjs.com/sdk/2.2.4/email.min.js"></script>
+    <!--<script src="https://unpkg.com/parse/dist/parse.min.js"></script>-->
+    <script src="js/parse.min.js"></script>
+    <!--<script type="text/javascript" src="https://cdn.emailjs.com/sdk/2.2.4/email.min.js"></script>-->
+    <script type="text/javascript" src="js/email.min.js"></script>
     <script>
         (function(){emailjs.init("user_8sGnKk68ABTJDav2YwKM4");})();
         
@@ -220,7 +225,7 @@
     
 
 
-<div id=#gocart>
+<div id=gocart>
 
     <div>
 
@@ -237,8 +242,8 @@
 
 
     <div class="row">
-        <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3"></div>
-        <div id="customerInfo" class="spacer col-lg-6 col-md-6 col-sm-6 col-xs-6">
+        <div class="col-lg-3 col-md-3 col-sm-3 col-xs-1"></div>
+        <div id="customerInfo" class="spacer col-lg-6 col-md-6 col-sm-6 col-xs-10">
             <form>
                 <div class="form-group">
                     <label for="exampleInputEmail1">Name</label>
@@ -259,7 +264,7 @@
                 <button type="submit" class="btn btn-primary" onclick="createOrder();return false;">Submit</button>
             </form>
         </div>
-        <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3"></div>
+        <div class="col-lg-3 col-md-3 col-sm-3 col-xs-1"></div>
     </div>
 
 
@@ -435,6 +440,7 @@
                 var modal = getModal(JSON.parse(catItemList[i]));
                 container.appendChild(modal);
             }
+            openModal();
         }
         
         function getFigure(category) {
@@ -488,7 +494,7 @@
                                         +'</div>'
                                         +'<div class="form-group">'
                                             +'<label>Quantity</label>'
-                                            +'<input type="number" value="1" min="1" max="10" class="form-control '+elem.category.objectId+'input" aria-label="Text input with dropdown button">'
+                                            +'<input type="number" value="1" min="1" max="10" class="form-control '+elem.category.objectId+'input" aria-label="Text input with dropdown button" onkeyup="checkValue(this);">'
                                         +'</div>'
                                         +'<button type="submit" class="btn btn-primary" onclick="addItemIntoCart(\''+elem.category.objectId+'\''+')" data-dismiss="modal">Add To Cart</button>'
                                     +'</div>'
@@ -577,9 +583,13 @@
             else
             {
                 var errorDiv = document.createElement("div");
-                errorDiv.className = "alert alert-danger";
-                errorDiv.role = "alert";
-                errorDiv.innerHTML = "Please add something in your cart";
+                errorDiv.className = "row";
+                errorDiv.innerHTML = '<div class="col-lg-3 col-md-3 col-sm-3 col-xs-1"></div>'
+                                    +'<div class="col-lg-6 col-md-6 col-sm-6 col-xs-10">'
+                                        +'<div class="alert alert-danger" role="alert">'
+                                            +'<strong>Cart is empty</strong>'
+                                        +'</div>'
+                                    +'</div>';
                 tablePanel.appendChild(errorDiv);
             }
                
@@ -689,6 +699,27 @@
 			orderInfo.appendChild(orderDiv);
 		}
 		
+        function checkValue(inputElem)
+        {
+            if(inputElem.value > 10)
+                inputElem.value = 10;
+        }
+        
+        function openModal()
+        {
+            $.urlParam = function(name){
+                var results = new RegExp('[\?&]' + name + '=([^&#]*)').exec(window.location.href);
+                if(results != undefined && results.length > 0)
+                    return results[1];
+            }
+            var modalId = $.urlParam('id');
+            if(modalId != undefined)
+            {
+                modalId = modalId.toUpperCase();
+                $("#"+modalId+"Modal").modal();
+                //window.location.href = window.location.href.substring(0, window.location.href.indexOf('?'));
+            }  
+        }
         $( window ).load(function() {
 			var cil = sessionStorage.getItem("catItemList");
             if(cil != null || sn != cil)
@@ -708,6 +739,8 @@
                 showCartItemCount();
                 showCartItemTable();
             }
+            
+            openModal();
         });
     </script>
 

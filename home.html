@@ -7,9 +7,12 @@
 <title>EatWell</title>
 
 <!-- Google fonts -->
-<link href='http://fonts.googleapis.com/css?family=Roboto:400,300,700' rel='stylesheet' type='text/css'>
-<link href='http://fonts.googleapis.com/css?family=Lobster' rel='stylesheet' type='text/css'>
-<link href='http://fonts.googleapis.com/css?family=Josefin+Sans:600' rel='stylesheet' type='text/css'>
+<!--<link href='http://fonts.googleapis.com/css?family=Roboto:400,300,700' rel='stylesheet' type='text/css'>-->
+<link href='css/familyRoboto.css' rel='stylesheet' type='text/css'>
+<!--<link href='http://fonts.googleapis.com/css?family=Lobster' rel='stylesheet' type='text/css'>-->
+<link href='css/familyLobster.css' rel='stylesheet' type='text/css'>
+<!--<link href='http://fonts.googleapis.com/css?family=Josefin+Sans:600' rel='stylesheet' type='text/css'>-->
+<link href='css/familyJosefin+Sans.css' rel='stylesheet' type='text/css'>
 
 <!-- font awesome -->
 <!--<link href="//maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css" rel="stylesheet">-->
@@ -33,8 +36,10 @@
 
     
     <!-- back4app -->
-    <script src="https://unpkg.com/parse/dist/parse.min.js"></script>
-    <script type="text/javascript" src="https://cdn.emailjs.com/sdk/2.2.4/email.min.js"></script>
+    <!--<script src="https://unpkg.com/parse/dist/parse.min.js"></script>-->
+    <script src="js/parse.min.js"></script>
+    <!--<script type="text/javascript" src="https://cdn.emailjs.com/sdk/2.2.4/email.min.js"></script>-->
+    <script type="text/javascript" src="js/email.min.js"></script>
     <script>
         (function(){emailjs.init("user_8sGnKk68ABTJDav2YwKM4");})();
         
@@ -148,7 +153,7 @@
             <!-- Nav Starts -->
             <div class="navbar-collapse  collapse">
               <ul class="nav navbar-nav navbar-right">
-                 <li ><a href="order2.html">Cart <span class="badge badge-light" id="cartBadge"></span></a></li>
+                 <li ><a href="order2.html">Order Now<span class="badge badge-light" id="cartBadge"></span></a></li>
               </ul>
               <ul class="nav navbar-nav navbar-right scroll">
                  <li class="active"><a href="#home">Home</a></li>
@@ -224,11 +229,11 @@
     </div>
     <div id="collapseOne" class="panel-collapse collapse" role="tabpanel">
       <div class="panel-body">
-        <div class="clearfix food-list"><div class="pull-left">Onion Tomato Capsicum Pizza</div><span class="pull-right">₹ 230.00</span></div>
-        <div class="clearfix food-list"><div class="pull-left">Mexican Green Wave</div><span class="pull-right">₹ 200.00</span></div>
-        <div class="clearfix food-list"><div class="pull-left">Spicy Paneer</div><span class="pull-right">₹ 240.00</span></div>
-        <div class="clearfix food-list"><div class="pull-left">Farm House</div><span class="pull-right">₹ 180.00</span></div>
-        <div class="clearfix food-list"><div class="pull-left">EatWell Special Pizza</div><span class="pull-right">₹ 250.00</span></div>
+        <div class="clearfix food-list"><a href="order2.html?id=pizza"><div class="pull-left">Onion Tomato Capsicum Pizza</div><span class="pull-right">₹ 230.00</span></a></div>
+        <div class="clearfix food-list"><a href="order2.html?id=pizza"><div class="pull-left">Mexican Green Wave</div><span class="pull-right">₹ 200.00</span></a></div>
+        <div class="clearfix food-list"><a href="order2.html?id=pizza"><div class="pull-left">Spicy Paneer</div><span class="pull-right">₹ 240.00</span></a></div>
+        <div class="clearfix food-list"><a href="order2.html?id=pizza"><div class="pull-left">Farm House</div><span class="pull-right">₹ 180.00</span></a></div>
+        <div class="clearfix food-list"><a href="order2.html?id=pizza"><div class="pull-left">EatWell Special Pizza</div><span class="pull-right">₹ 250.00</span></a></div>
       </div>
     </div>
   </div>
@@ -242,10 +247,10 @@
     </div>
     <div id="collapseTwo" class="panel-collapse collapse" role="tabpanel">
       <div class="panel-body">
-        <div class="clearfix food-list"><div class="pull-left">Plain Samosa</div><span class="pull-right">₹ 10.00</span></div>
-        <div class="clearfix food-list"><div class="pull-left">Aloo Samosa</div><span class="pull-right">₹ 15.00</span></div>
-        <div class="clearfix food-list"><div class="pull-left">Chilly Samosa</div><span class="pull-right">₹ 18.00</span></div>
-        <div class="clearfix food-list"><div class="pull-left">EatWell Special Samosa</div><span class="pull-right">₹ 20.00</span></div>
+        <div class="clearfix food-list"><a href="order2.html?id=samosa"><div class="pull-left">Plain Samosa</div><span class="pull-right">₹ 10.00</span></a></div>
+        <div class="clearfix food-list"><a href="order2.html?id=samosa"><div class="pull-left">Aloo Samosa</div><span class="pull-right">₹ 15.00</span></a></div>
+        <div class="clearfix food-list"><a href="order2.html?id=samosa"><div class="pull-left">Chilly Samosa</div><span class="pull-right">₹ 18.00</span></a></div>
+        <div class="clearfix food-list"><a href="order2.html?id=samosa"><div class="pull-left">EatWell Special Samosa</div><span class="pull-right">₹ 20.00</span></a></div>
       </div>
     </div>
   </div>
@@ -259,12 +264,12 @@
     </div>
     <div id="collapseThree" class="panel-collapse collapse" role="tabpanel">
       <div class="panel-body">
-        <div class="clearfix food-list"><div class="pull-left">Plain Dosa</div><span class="pull-right">₹ 110.00</span></div>
-        <div class="clearfix food-list"><div class="pull-left">Paneer Dosa</div><span class="pull-right">₹ 150.00</span></div>
-        <div class="clearfix food-list"><div class="pull-left">Mysoor Dosa</div><span class="pull-right">₹ 120.00</span></div>
-        <div class="clearfix food-list"><div class="pull-left">Cheese Masala Dosa</div><span class="pull-right">₹ 160.00</span></div>
-        <div class="clearfix food-list"><div class="pull-left">Desi Ghee Dosa</div><span class="pull-right">₹ 160.00</span></div>
-        <div class="clearfix food-list"><div class="pull-left">EatWell Special Dosa</div><span class="pull-right">₹ 170.00</span></div>  
+        <div class="clearfix food-list"><a href="order2.html?id=dosa"><div class="pull-left">Plain Dosa</div><span class="pull-right">₹ 110.00</span></a></div>
+        <div class="clearfix food-list"><a href="order2.html?id=dosa"><div class="pull-left">Paneer Dosa</div><span class="pull-right">₹ 150.00</span></a></div>
+        <div class="clearfix food-list"><a href="order2.html?id=dosa"><div class="pull-left">Mysoor Dosa</div><span class="pull-right">₹ 120.00</span></a></div>
+        <div class="clearfix food-list"><a href="order2.html?id=dosa"><div class="pull-left">Cheese Masala Dosa</div><span class="pull-right">₹ 160.00</span></a></div>
+        <div class="clearfix food-list"><a href="order2.html?id=dosa"><div class="pull-left">Desi Ghee Dosa</div><span class="pull-right">₹ 160.00</span></a></div>
+        <div class="clearfix food-list"><a href="order2.html?id=dosa"><div class="pull-left">EatWell Special Dosa</div><span class="pull-right">₹ 170.00</span></a></div>  
       </div>
     </div>
   </div>
@@ -279,10 +284,10 @@
     </div>
     <div id="collapseFour" class="panel-collapse collapse" role="tabpanel">
       <div class="panel-body">
-        <div class="clearfix food-list"><div class="pull-left">Aloo Tikki Burger</div><span class="pull-right">₹ 70.00</span></div>
-        <div class="clearfix food-list"><div class="pull-left">Veggi Special Burger</div><span class="pull-right">₹ 90.00</span></div>
-        <div class="clearfix food-list"><div class="pull-left">Double Tikki Burger</div><span class="pull-right">₹ 100.00</span></div>
-        <div class="clearfix food-list"><div class="pull-left">Extra Cheese Burger</div><span class="pull-right">₹ 120.00</span></div>
+        <div class="clearfix food-list"><a href="order2.html?id=burger"><div class="pull-left">Aloo Tikki Burger</div><span class="pull-right">₹ 70.00</span></a></div>
+        <div class="clearfix food-list"><a href="order2.html?id=burger"><div class="pull-left">Veggi Special Burger</div><span class="pull-right">₹ 90.00</span></a></div>
+        <div class="clearfix food-list"><a href="order2.html?id=burger"><div class="pull-left">Double Tikki Burger</div><span class="pull-right">₹ 100.00</span></a></div>
+        <div class="clearfix food-list"><a href="order2.html?id=burger"><div class="pull-left">Extra Cheese Burger</div><span class="pull-right">₹ 120.00</span></a></div>
       </div>
     </div>
   </div>
@@ -297,10 +302,10 @@
     </div>
     <div id="collapseFive" class="panel-collapse collapse" role="tabpanel">
       <div class="panel-body">
-        <div class="clearfix food-list"><div class="pull-left">Chocolate Truffle</div><span class="pull-right">₹ 80.00</span></div>
-        <div class="clearfix food-list"><div class="pull-left">Vanilla Pastry</div><span class="pull-right">₹ 40.00</span></div>
-        <div class="clearfix food-list"><div class="pull-left">Choco Lava Cake</div><span class="pull-right">₹ 100.00</span></div>
-        <div class="clearfix food-list"><div class="pull-left">Frost Bite Ice Cream</div><span class="pull-right">₹ 70.00</span></div>
+        <div class="clearfix food-list"><a href="order2.html?id=dessert"><div class="pull-left">Chocolate Truffle</div><span class="pull-right">₹ 80.00</span></a></div>
+        <div class="clearfix food-list"><a href="order2.html?id=dessert"><div class="pull-left">Vanilla Pastry</div><span class="pull-right">₹ 40.00</span></a></div>
+        <div class="clearfix food-list"><a href="order2.html?id=dessert"><div class="pull-left">Choco Lava Cake</div><span class="pull-right">₹ 100.00</span></a></div>
+        <div class="clearfix food-list"><a href="order2.html?id=dessert"><div class="pull-left">Frost Bite Ice Cream</div><span class="pull-right">₹ 70.00</span></a></div>
       </div>
     </div>
   </div>
@@ -315,11 +320,11 @@
     </div>
     <div id="collapseSix" class="panel-collapse collapse" role="tabpanel">
       <div class="panel-body">
-        <div class="clearfix food-list"><div class="pull-left">Dark Coffee</div><span class="pull-right">₹ 60.00</span></div>
-        <div class="clearfix food-list"><div class="pull-left">Espresso</div><span class="pull-right">₹ 70.00</span></div>
-        <div class="clearfix food-list"><div class="pull-left">Ristretto</div><span class="pull-right">₹ 70.00</span></div>
-        <div class="clearfix food-list"><div class="pull-left">Cappuccino</div><span class="pull-right">₹ 80.00</span></div>
-        <div class="clearfix food-list"><div class="pull-left">Cafe Latte</div><span class="pull-right">₹ 100.00</span></div>
+        <div class="clearfix food-list"><a href="order2.html?id=coffee"><div class="pull-left">Dark Coffee</div><span class="pull-right">₹ 60.00</span></a></div>
+        <div class="clearfix food-list"><a href="order2.html?id=coffee"><div class="pull-left">Espresso</div><span class="pull-right">₹ 70.00</span></a></div>
+        <div class="clearfix food-list"><a href="order2.html?id=coffee"><div class="pull-left">Ristretto</div><span class="pull-right">₹ 70.00</span></a></div>
+        <div class="clearfix food-list"><a href="order2.html?id=coffee"><div class="pull-left">Cappuccino</div><span class="pull-right">₹ 80.00</span></a></div>
+        <div class="clearfix food-list"><a href="order2.html?id=coffee"><div class="pull-left">Cafe Latte</div><span class="pull-right">₹ 100.00</span></a></div>
       </div>
     </div>
   </div>
@@ -521,16 +526,23 @@ Copyright 2018 EatWell Cafe & Restaurant. All rights reserved.
 <!-- gallery -->
 <script src="assets/gallery/jquery.blueimp-gallery.min.js"></script>
 
-<script src='https://maps.googleapis.com/maps/api/js?key=&sensor=false&extension=.js'></script> 
+<!--<script src='https://maps.googleapis.com/maps/api/js?key=&sensor=false&extension=.js'></script> -->
 
-
+<script src="assets/script.js"></script>
+    
 <!-- custom script -->
 <script>
 	// Show item count in top nave bar's cart link
 	function showCartItemCount()
 	{
 		var badge = document.getElementById("cartBadge");
-		badge.innerHTML = cartItems.length;
+        if(cartItems.length > 0)
+        {
+            badge.innerHTML = cartItems.length;
+            badge.style.display = "inline";
+        }
+        else
+            badge.style.display = "none";
 	}
 	showCartItemCount();
 	$( window ).load(function() {

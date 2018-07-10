@@ -6,20 +6,31 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
 		<!-- Bootstrap CSS -->
-		<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" integrity="sha384-WskhaSGFgHYWDcbwN70/dfYBj47jz9qbsMId/iRN3ewGhXQFZCSftd1LZCfmhktB" crossorigin="anonymous">
+		<!--<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" integrity="sha384-WskhaSGFgHYWDcbwN70/dfYBj47jz9qbsMId/iRN3ewGhXQFZCSftd1LZCfmhktB" crossorigin="anonymous">-->
+        
+        <link rel="stylesheet" href="css/bootstrap.min.css">
 
 		<!-- jquery -->
 		<script src="assets/jquery.js"></script>
 		
 		<!-- Optional JavaScript -->
 		<!-- jQuery first, then Popper.js, then Bootstrap JS -->
-		<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
-		<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
-		<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js" integrity="sha384-smHYKdLADwkXOn1EmN1qk/HfnUcbVRZyYmZ4qpPea6sjB/pTJ0euyQp0Mk8ck+5T" crossorigin="anonymous"></script>
+		<!--<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>-->
+        <script src="js/jquery-3.3.1.slim.min.js"></script>
+        
+		<!--<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>-->
+        
+        <script src="js/popper.min.js"></script>
+        
+		<!--<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js" integrity="sha384-smHYKdLADwkXOn1EmN1qk/HfnUcbVRZyYmZ4qpPea6sjB/pTJ0euyQp0Mk8ck+5T" crossorigin="anonymous"></script>-->
+        
+        <script src="js/bootstrap.min.js"></script>
 
 		<!-- back4app -->
-		<script src="https://unpkg.com/parse/dist/parse.min.js"></script>
-		<script type="text/javascript" src="https://cdn.emailjs.com/sdk/2.2.4/email.min.js"></script>
+		<!--<script src="https://unpkg.com/parse/dist/parse.min.js"></script>-->
+        <script src="js/parseadmin.min.js"></script>
+		<!--<script type="text/javascript" src="https://cdn.emailjs.com/sdk/2.2.4/email.min.js"></script>-->
+        <script type="text/javascript" src="js/emailadmin.min.js"></script>
 		<title>Admin Panel</title>
 	</head>
 	<body>
@@ -103,6 +114,7 @@
 					pendingOrdersPanel.appendChild(createOrderCard(customerPendingOrders[i], "Pending"));
 					//console.log(createOrderCard(customerPendingOrders[i], "Pending"));
 				}
+				showPandingOrdersCount();
 				
 				var completedOrdersPanel = document.getElementById("completedOrdersPanel");
 				completedOrdersPanel.innerHTML = "<br/>";
@@ -120,11 +132,11 @@
 				var showCompletedButton = 'none';
 				if(status=="Pending")
 				{
-					bg = 'bg-secondary';
+					bg = 'secondary';
 					showCompletedButton = 'block'
 				}
 				else if(status=="Completed")
-					bg = 'bg-success';
+					bg = 'success';
 				for(var i=0; i<customerOrderObject.items.length; i++)
 				{
 					var subtotal = (parseInt(customerOrderObject.items[i].quantity))*(customerOrderObject.items[i].item.Price);
@@ -139,18 +151,21 @@
 				}
 				var orderDiv = document.createElement("div");
 				orderDiv.className = "row";
-				orderDiv.innerHTML = '<div class="col-lg-1 col-md-1 col-sm-1 col-xs-1"></div>'
-									+'<div class="card text-white '+bg+' mb-3 col-lg-10 col-md-10 col-sm-10 col-xs-10">'
-										+'<div class="card-header" >'
-											+'<ul class="list-group list-group-flush">'
-												+'<li class="list-group-item '+bg+'">Order ID: '+customerOrderObject.objectId+'</li>'
-												+'<li class="list-group-item '+bg+'">Order Status: '+customerOrderObject.Status+'</li>'
-												+'<li class="list-group-item '+bg+'">Customer Name: '+customerOrderObject.CustomerName+'</li>'
-												+'<li class="list-group-item '+bg+'">Address: '+customerOrderObject.Address+'</li>'
-												+'<li class="list-group-item '+bg+'">Contact Number: '+customerOrderObject.phoneNumber+'</li>'
-											+'</ul>'
+				orderDiv.innerHTML = '<div class="col-lg-1 col-md-1 col-sm-1"></div>'
+									+'<div class="card text-'+bg+' border-'+bg+' mb-3 col-lg-10 col-md-10 col-sm-10 col-xs-10">'
+										+'<div class="card-header row" >'
+											+'<div class="col-lg-6 col-md-6 col-sm-12 col-xs-12"><ul class="list-group list-group-flush">'
+												+'<li class="list-group-item border-'+bg+'"><span style="font-weight: bold;">Order ID: </span>'+customerOrderObject.objectId+'</li>'
+												+'<li class="list-group-item border-'+bg+'"><span style="font-weight: bold;">Order Status: </span>'+customerOrderObject.Status+'</li>'
+												+'<li class="list-group-item border-'+bg+'"><span style="font-weight: bold;">Customer Name: </span>'+customerOrderObject.CustomerName+'</li>'
+											+'</ul></div>'
+											+'<div class="col-lg-6 col-md-6 col-sm-12 col-xs-12"><ul class="list-group list-group-flush">'
+												+'<li class="list-group-item border-'+bg+'"><span style="font-weight: bold;">Email : </span>'+customerOrderObject.Email+'</li>'
+												+'<li class="list-group-item border-'+bg+'"><span style="font-weight: bold;">Address: </span>'+customerOrderObject.Address+'</li>'
+												+'<li class="list-group-item border-'+bg+'"><span style="font-weight: bold;">Contact Number: </span>'+customerOrderObject.phoneNumber+'</li>'
+											+'</ul></div>'
 										+'</div>'
-										+'<div class="card-body">'
+										+'<div class="card-body text-"'+bg+'>'
 											+'<h5 class="card-title" style="font-weight: bold">Item List</h5>'
 											+'<table class="table">'
 												+'<thead class="thead-light">'
@@ -176,10 +191,10 @@
 										+'</div>'
 										+'<div class="text-center" style="display:'+showCompletedButton+'">'
 											+'<a href="#" class="btn btn-primary" onclick="changeOrderStatus(\''+customerOrderObject.objectId.trim()+'\');return false;">Completed</a>'
-											+'<br/>'
-									   +'</div>'
+										+'</div>'
+										+'<br/>'
 									+'</div>'
-									+'<div class="col-lg-1 col-md-1 col-sm-1 col-xs-1"></div>';
+									+'<div class="col-lg-1 col-md-1 col-sm-1"></div>';
 				return orderDiv;
 			}
 			
@@ -223,15 +238,22 @@
 					}
 				});
 			}
+				
+			// Show item count in top nave bar's cart link
+			function showPandingOrdersCount()
+			{
+				var badge = document.getElementById("pandingOrders");
+				badge.innerHTML = customerPendingOrders.length;
+			}
 		</script>
 		<div class="card text-center">
 		  <div class="card-header">
-			<ul class="nav nav-tabs card-header-tabs navbar">
+			<ul class="nav nav-pills card-header-tabs navbar">
 			  <li class="nav-item">
-				<a class="nav-link" onclick="showPendingOrders();">Pending Orders</a>
+				<a class="nav-link active" id="pendingPill" onclick="showPendingOrders();" style="cursor: pointer;">Pending Orders <span class="badge badge-dark" id="pandingOrders"></span></a>
 			  </li>
 			  <li class="nav-item">
-				<a class="nav-link" onclick="showCompletedOrders();">Completed Orders</a>
+				<a class="nav-link " id="completedPill" onclick="showCompletedOrders();" style="cursor: pointer;">Completed Orders</a>
 			  </li>
 			</ul>
 		  </div>
@@ -299,12 +321,22 @@
 			{
 				$("#pendingOrdersPanel").css("display", "block");
 				$("#completedOrdersPanel").css("display", "none");
+				
+				if(!($("#pendingPill").hasClass("active")))
+					$("#pendingPill").addClass("active");
+				if($("#completedPill").hasClass("active"))
+					$("#completedPill").removeClass("active");
 			}
 			
 			function showCompletedOrders()
 			{
 				$("#pendingOrdersPanel").css("display", "none");
 				$("#completedOrdersPanel").css("display", "block");
+				
+				if($("#pendingPill").hasClass("active"))
+					$("#pendingPill").removeClass("active");
+				if(!($("#completedPill").hasClass("active")))
+					$("#completedPill").addClass("active");
 			}
 		
 			$(document).ready(function() {
