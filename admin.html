@@ -47,6 +47,7 @@
 			{
 				var order = Parse.Object.extend("CustomerOrders");
 				var query = new Parse.Query(order);
+                query.descending("Date");
 				query.find({
 					success: function(results) {
 						for(var i=0; i < results.length; i++)
@@ -158,11 +159,13 @@
 												+'<li class="list-group-item border-'+bg+'"><span style="font-weight: bold;">Order ID: </span>'+customerOrderObject.objectId+'</li>'
 												+'<li class="list-group-item border-'+bg+'"><span style="font-weight: bold;">Order Status: </span>'+customerOrderObject.Status+'</li>'
 												+'<li class="list-group-item border-'+bg+'"><span style="font-weight: bold;">Customer Name: </span>'+customerOrderObject.CustomerName+'</li>'
+												+'<li class="list-group-item border-'+bg+'"><span style="font-weight: bold;">Payment Option: </span>'+customerOrderObject.paymentOption+'</li>'
 											+'</ul></div>'
 											+'<div class="col-lg-6 col-md-6 col-sm-12 col-xs-12"><ul class="list-group list-group-flush">'
 												+'<li class="list-group-item border-'+bg+'"><span style="font-weight: bold;">Email : </span>'+customerOrderObject.Email+'</li>'
 												+'<li class="list-group-item border-'+bg+'"><span style="font-weight: bold;">Address: </span>'+customerOrderObject.Address+'</li>'
 												+'<li class="list-group-item border-'+bg+'"><span style="font-weight: bold;">Contact Number: </span>'+customerOrderObject.phoneNumber+'</li>'
+												+'<li class="list-group-item border-'+bg+'"><span style="font-weight: bold;">Created At: </span>'+formatDate(new Date(customerOrderObject.createdAt))+'</li>'
 											+'</ul></div>'
 										+'</div>'
 										+'<div class="card-body text-"'+bg+'>'
@@ -190,7 +193,7 @@
 											+'</table>'
 										+'</div>'
 										+'<div class="text-center" style="display:'+showCompletedButton+'">'
-											+'<a href="#" class="btn btn-primary" onclick="changeOrderStatus(\''+customerOrderObject.objectId.trim()+'\');return false;">Completed</a>'
+											+'<a href="#" class="btn btn-primary" onclick="changeOrderStatus(\''+customerOrderObject.objectId.trim()+'\', \''+tAmount+'\');return false;">Completed</a>'
 										+'</div>'
 										+'<br/>'
 									+'</div>'
@@ -198,7 +201,7 @@
 				return orderDiv;
 			}
 			
-			function changeOrderStatus(orderId)
+			function changeOrderStatus(orderId, totalAmount)
 			{
 				var customerOrders = Parse.Object.extend("CustomerOrders");
 				var query = new Parse.Query(customerOrders);
@@ -223,9 +226,10 @@
 								var templateParams = {
 														"to_email": ""+order.Email,
 														"orderId": ""+order.objectId,
-														"to_name": ""+order.CustomerName
+														"to_name": ""+order.CustomerName,
+														"totalAmount": ""+totalAmount
 													};
-								emailjs.send("pranjal9701_gmail_com", "eatwell_order_completed_template", templateParams)
+								emailjs.send("eatwell_gmail_com", "eatwell_order_completed_template", templateParams)
 									.then(function(response) {
 											console.log('SUCCESS!', response.status, response.text);
 										}, function(error) {
@@ -245,6 +249,16 @@
 				var badge = document.getElementById("pandingOrders");
 				badge.innerHTML = customerPendingOrders.length;
 			}
+            function formatDate(date) {
+                var hours = date.getHours();
+                var minutes = date.getMinutes();
+                var ampm = hours >= 12 ? 'PM' : 'AM';
+                hours = hours % 12;
+                hours = hours ? hours : 12; // the hour '0' should be '12'
+                minutes = minutes < 10 ? '0'+minutes : minutes;
+                var strTime = hours + ':' + minutes + ' ' + ampm;
+                return date.getDate() + "/" + (date.getMonth()+1) + "/" + date.getFullYear() + "  " + strTime;
+            }
 		</script>
 		<div class="card text-center">
 		  <div class="card-header">

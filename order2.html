@@ -172,6 +172,10 @@
         }
     </script>
     <!-- back4app -->
+    
+    <style>
+        .requiredfield {border-color: red !important;}
+    </style>
 </head>
     
 <body>
@@ -204,7 +208,8 @@
                     <div class="navbar-collapse  collapse">
                         <ul class="nav navbar-nav navbar-right scroll">
                             <li class="active"><a href="home.html">Home</a></li>
-                            <li class="active"><a href="#gocart">Cart <span class="badge badge-light" id="cartBadge"></span></a></li>
+                            <li class="active"><a href="#gocart"><span class="glyphicon glyphicon-shopping-cart" style="font-size: 20px;"><span class="badge badge-light" id="cartBadge"></span></a></li>
+                            <li class="active"><a href="#trackOrder">Track Order</a></li>
 
                         </ul>
                     </div>
@@ -246,21 +251,44 @@
         <div id="customerInfo" class="spacer col-lg-6 col-md-6 col-sm-6 col-xs-10">
             <form>
                 <div class="form-group">
-                    <label for="exampleInputEmail1">Name</label>
+                    <label for="exampleInputEmail1 requiredField">Name<sup>*</sup></label>
                     <input type="text" class="form-control" id="customerName" placeholder="Enter your Name" />
                 </div>
                 <div class="form-group">
-                    <label for="exampleInputEmail1">Email address</label>
+                    <label for="exampleInputEmail1 requiredField">Email address<sup>*</sup></label>
                     <input type="email" class="form-control" id="customerEmail" placeholder="Enter email" />
                 </div>
                 <div class="form-group">
-                    <label for="exampleInputEmail1">Address</label>
+                    <label for="exampleInputEmail1 requiredField">Address<sup>*</sup></label>
                     <input type="text-area" rows="4" class="form-control" id="customerAddress"/>
                 </div>
                 <div class="form-group">
-                    <label for="exampleInputEmail1">Mobile Number</label>
-                    <input type="text" class="form-control" id="customerMobile" placeholder="Enter Mobile Number" />
+                    <label for="exampleInputEmail1 requiredField">Mobile Number<sup>*</sup></label>
+                    <input type="text" class="form-control" id="customerMobile" placeholder="Enter Mobile Number"  onkeyup="this.value=this.value.replace(/[^\d-]/g, '')" />
                 </div>
+                <div class="form-group">
+                    <label>Payment Options</label>
+                </div>
+                <div class="form-group">
+                    <div class="custom-control custom-radio custom-control-inline col-lg-3 col-md-3 col-sm-6">
+                        <input class="custom-control-input" type="radio" name="inlinePaymentOptions" id="inlineRadio1" value="Cash On Delivery" checked="true"/>
+                        <label class="custom-control-label" for="inlineRadio1">Cash On Delivery</label>
+                    </div>
+                    <div class="custom-control custom-radio custom-control-inline col-lg-3 col-md-3 col-sm-6">
+                        <input class="custom-control-input" type="radio" name="inlinePaymentOptions" id="inlineRadio2" value="Take away"/>
+                        <label class="custom-control-label" for="inlineRadio2">Take away</label>
+                    </div>
+                    <div class="custom-control custom-radio custom-control-inline col-lg-3 col-md-3 col-sm-6">
+                        <input class="custom-control-input" type="radio" name="inlinePaymentOptions" id="inlineRadio3" value="Credit Card" disabled/>
+                        <label class="custom-control-label" for="inlineRadio3">Credit Card</label>
+                    </div>
+                    <div class="custom-control custom-radio custom-control-inline col-lg-3 col-md-3 col-sm-6">
+                        <input class="custom-control-input" type="radio" name="inlinePaymentOptions" id="inlineRadio4" value="Debit Card" disabled/>
+                        <label class="custom-control-label" for="inlineRadio4">Debit Card</label>
+                    </div>
+                    <br/>
+                </div>
+                <div id="errorMsgOrderInfo" style="display:none; color:red;"><strong>Error:</strong>Please fill valid values in all required fields</div>
                 <button type="submit" class="btn btn-primary" onclick="createOrder();return false;">Submit</button>
             </form>
         </div>
@@ -319,7 +347,8 @@
 			<div class="col-lg-2 col-md-2 col-sm-2 col-xs-1"></div>
 		</div>
 	</div>
-
+    <br/>
+    <br/>
     <!-- Footer Starts -->
     <div class="footer text-center spacer">
         <p class="wowload flipInX"><a href="#"><i class="fa fa-facebook fa-2x"></i></a><a href="#"><i class="fa fa-instagram fa-2x"></i></a><a href="#"><i class="fa fa-twitter fa-2x"></i></a><a href="#"><i class="fa fa-flickr fa-2x"></i></a></p>
@@ -367,8 +396,64 @@
 
     <script>
         var itemInsertCount = 0;
+        
+        function validateOrder()
+        {
+
+            // Name
+            if($("#customerName").val()=='')
+            {
+                if(!$("#customerName").hasClass('requiredfield'))
+                    $("#customerName").addClass('requiredfield');
+            }
+            else if($("#customerName").hasClass('requiredfield'))
+                    $("#customerName").removeClass('requiredfield');
+
+            // Address
+            if($("#customerAddress").val()=='')
+            {
+                if(!$("#customerAddress").hasClass('requiredfield'))
+                    $("#customerAddress").addClass('requiredfield');
+            }
+            else if($("#customerAddress").hasClass('requiredfield'))
+                    $("#customerAddress").removeClass('requiredfield');
+            
+            //  email
+            if($("#customerEmail").val()=='' || !validateEmail($("#customerEmail").val()))
+            {
+                if(!$("#customerEmail").hasClass('requiredfield'))
+                    $("#customerEmail").addClass('requiredfield');
+            }
+            else if($("#customerEmail").hasClass('requiredfield'))
+                    $("#customerEmail").removeClass('requiredfield');
+
+            // Mobile
+            if($("#customerMobile").val()=='')
+            {
+                if(!$("#customerMobile").hasClass('requiredfield'))
+                    $("#customerMobile").addClass('requiredfield');
+            }
+            else if($("#customerMobile").hasClass('requiredfield'))
+                    $("#customerMobile").removeClass('requiredfield');
+            if(!validateEmail($("#customerEmail").val()) || $("#customerMobile").val()=='' || $("#customerAddress").val()=='' || $("#customerName").val()=='')
+            {
+                $("#errorMsgOrderInfo").css('display', 'block');
+                return false;
+            }
+            $("#errorMsgOrderInfo").css('display', 'none');
+            return true;
+        }
+        function validateEmail(email)
+        {
+            var re = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+            return re.test(email);
+        }
+        
         function createOrder()
         {
+            if(!validateOrder())
+                return;
+            
             var CustomerOrders = Parse.Object.extend("CustomerOrders");
             var customerOrder = new CustomerOrders();
 
@@ -377,6 +462,8 @@
             var address = $("#customerAddress").val();
             var mobile = $("#customerMobile").val();
 			var order = $("#orderId").val();
+			var paymentOption = $("input[name='inlinePaymentOptions']:checked").val();
+               
             customerOrder.set("CustomerName", name);
             customerOrder.set("Email", email);
             customerOrder.set("Address", address);
@@ -384,6 +471,7 @@
             customerOrder.set("Date", new Date());
             customerOrder.set("Status", "Pending");
 			customerOrder.set("orderId", order);
+			customerOrder.set("paymentOption", paymentOption);
             customerOrder.save(null, {
             success: function(customerOrder) {
                 itemInsertCount = 0;
@@ -406,9 +494,10 @@
                                 var templateParams = {
                                                         "to_email": ""+$("#customerEmail").val(),
                                                         "orderId": ""+customerOrder.id,
-                                                        "to_name": ""+$("#customerName").val()
+                                                        "to_name": ""+$("#customerName").val(),
+                                                        "message_html": ""+emailTable
                                                     };
-                                emailjs.send("pranjal9701_gmail_com", "template_gYR8FhrG", templateParams)
+                                emailjs.send("eatwell_gmail_com", "template_gYR8FhrG", templateParams)
                                     .then(function(response) {
                                             //console.log('SUCCESS!', response.status, response.text);
                                                 location.reload();
@@ -456,7 +545,7 @@
             figCap.innerHTML =
                 ' <h2> ' + category.Name + ' </h2> '
                + ' <p> ' + category.Description + ' <br> '
-               + '     <a href="images/portfolio/7.jpg" title="1" data-gallery>View more</a> '
+               /*+ '     <a href="images/portfolio/7.jpg" title="1" data-gallery>View more</a> '*/
                + '     <br /> '
                + '     <br /> '
                + '     <!-- Trigger the modal with a button --> '
@@ -537,6 +626,7 @@
         }
         
         // This method will add inner HTML in table div, each time when an item is added into the cart
+        var emailTable = "";
         function showCartItemTable()
         {
             var tablePanel = document.getElementById("tablePanel");
@@ -578,7 +668,8 @@
                             +'<th scope="col">'+totalAmount+'</th>'
                         +'</tr>'
                     +'</tfoot>'
-                +'</table>'
+                +'</table>';
+                emailTable = tablePanel.innerHTML;
             }
             else
             {
